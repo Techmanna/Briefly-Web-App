@@ -6,7 +6,7 @@ export function useUpdatePreferencesMutation(userId: string) {
   return useMutation({
     mutationFn: (input: usersClient.UpdatePreferencesInput) =>
       usersClient.updatePreferences(userId, input),
-    onSuccess: (user) => {
+    onSuccess: (user: usersClient.User) => {
       queryClient.setQueryData(["user", userId], user);
     },
   });
@@ -24,9 +24,8 @@ export function useConfirmPhoneVerificationMutation(userId: string) {
   return useMutation({
     mutationFn: (input: { code: string }) =>
       usersClient.confirmPhoneVerification(userId, input),
-    onSuccess: (user) => {
+    onSuccess: (user: usersClient.User) => {
       queryClient.setQueryData(["user", userId], user);
     },
   });
 }
-

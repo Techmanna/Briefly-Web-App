@@ -10,7 +10,8 @@ export function useLoginMutation() {
   const auth = useAuth();
   return useMutation({
     mutationFn: authClient.login,
-    onSuccess: (res) => auth.setSession(toSession(res)),
+    onSuccess: (res: authClient.AuthResponse) =>
+      auth.setSession(toSession(res)),
   });
 }
 
@@ -18,7 +19,8 @@ export function useRegisterMutation() {
   const auth = useAuth();
   return useMutation({
     mutationFn: authClient.register,
-    onSuccess: (res) => auth.setSession(toSession(res)),
+    onSuccess: (res: authClient.AuthResponse) =>
+      auth.setSession(toSession(res)),
   });
 }
 
@@ -26,7 +28,8 @@ export function useGoogleLoginMutation() {
   const auth = useAuth();
   return useMutation({
     mutationFn: authClient.googleLogin,
-    onSuccess: (res) => auth.setSession(toSession(res)),
+    onSuccess: (res: authClient.AuthResponse) =>
+      auth.setSession(toSession(res)),
   });
 }
 
@@ -50,7 +53,8 @@ export function useWhatsappVerifyOtpMutation() {
   const auth = useAuth();
   return useMutation({
     mutationFn: authClient.whatsappVerifyOtp,
-    onSuccess: (res) => auth.setSession(toSession(res)),
+    onSuccess: (res: authClient.AuthResponse) =>
+      auth.setSession(toSession(res)),
   });
 }
 
@@ -58,7 +62,8 @@ export function useTelegramRegisterMutation() {
   const auth = useAuth();
   return useMutation({
     mutationFn: authClient.telegramRegister,
-    onSuccess: (res) => auth.setSession(toSession(res)),
+    onSuccess: (res: authClient.TelegramRegisterResponse) =>
+      auth.setSession(toSession(res)),
   });
 }
 
