@@ -100,6 +100,10 @@ export default function SettingsPage() {
   };
 
   async function onSaveCategories() {
+    if (selectedCategoryIds.length < 3) {
+      toast.error("Please select at least 3 categories.");
+      return;
+    }
     try {
       await updatePreferences.mutateAsync({ categoryIds: selectedCategoryIds });
       setSelectedCategoryIdsDraft(null);
@@ -301,12 +305,15 @@ export default function SettingsPage() {
               className="rounded-full px-6 shadow-sm"
               onClick={onSaveCategories}
               disabled={
+                selectedCategoryIds.length < 3 ||
                 categoriesQuery.isPending ||
                 userQuery.isPending ||
                 updatePreferences.isPending
               }
             >
-              Save Categories
+              {selectedCategoryIds.length < 3
+                ? `Select ${3 - selectedCategoryIds.length} more`
+                : "Save Categories"}
             </Button>
           </CardFooter>
         </Card>
