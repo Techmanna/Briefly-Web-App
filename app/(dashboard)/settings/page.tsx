@@ -27,6 +27,9 @@ import {
 } from "@/api";
 import { useAuth } from "@/lib/auth/use-auth";
 import { toast } from "@/lib/toast";
+import { getVAPIDkey } from "@/api/clients/config";
+import { getFCM } from "@/lib/firebase";
+import { getToken, deleteToken } from "firebase/messaging";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -71,6 +74,8 @@ export default function SettingsPage() {
   const [phoneNumberDraft, setPhoneNumberDraft] = useState<string | null>(null);
   const [phoneCode, setPhoneCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [isVerificationPending, setIsVerificationPending] = useState(false);
+  const [isPushSubscribing, setIsPushSubscribing] = useState(false);
 
   const selectedCategoryIds =
     selectedCategoryIdsDraft ??
@@ -126,6 +131,7 @@ export default function SettingsPage() {
     try {
       const res = await requestPhoneVerification.mutateAsync({ phoneNumber });
       setPhoneNumberDraft(null);
+      setIsVerificationPending(true);
       toast.success("Code sent", { description: res.message });
     } catch (e) {
       toast.error((e as Error).message || "Failed to send code");
@@ -136,6 +142,7 @@ export default function SettingsPage() {
     try {
       await confirmPhoneVerification.mutateAsync({ code: phoneCode });
       setPhoneCode("");
+      setIsVerificationPending(false);
       toast.success("Phone verified");
     } catch (e) {
       toast.error((e as Error).message || "Failed to verify phone");
@@ -162,6 +169,85 @@ export default function SettingsPage() {
     queryClient.clear();
     toast.success("Logged out");
     router.push("/login");
+  }
+
+  async function onTogglePush(enabled: boolean) {
+    setPushEnabledDraft(enabled);
+    if (enabled) {
+      await subscribeToPush();
+    } else {
+      await unsubscribeFromPush();
+    }
+  }
+
+  async function subscribeToPush() {
+    const messaging = await getFCM();
+    if (!messaging) {
+      toast.error("Firebase Messaging is not supported in this browser.");
+      return;
+    }
+
+    setIsPushSubscribing(true);
+    try {
+      // Permission is handled automatically by getToken, but let's check
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        toast.error("Notification permission denied.");
+        setPushEnabledDraft(false);
+        return;
+      }
+
+      // Explicitly register the FCM service worker to ensure correct context
+      const registration = await navigator.serviceWorker.register(
+        "/firebase-messaging-sw.js",
+        {
+          scope: "/firebase-cloud-messaging-push-scope",
+        },
+      );
+
+      const token = await getToken(messaging, {
+        vapidKey: getVAPIDkey(),
+        serviceWorkerRegistration: registration,
+      });
+
+      if (!token) {
+        toast.error("Failed to get push token.");
+        setPushEnabledDraft(false);
+        return;
+      }
+
+      await updatePreferences.mutateAsync({
+        pushToken: token,
+        pushEnabled: true,
+      });
+      toast.success("Push notifications enabled!");
+    } catch (error) {
+      console.error("Failed to subscribe to push notifications", error);
+      toast.error("Failed to enable push notifications.");
+      setPushEnabledDraft(false);
+    } finally {
+      setIsPushSubscribing(false);
+    }
+  }
+
+  async function unsubscribeFromPush() {
+    const messaging = await getFCM();
+    if (!messaging) return;
+
+    setIsPushSubscribing(true);
+    try {
+      await deleteToken(messaging);
+      await updatePreferences.mutateAsync({
+        pushToken: undefined,
+        pushEnabled: false,
+      });
+      toast.success("Push notifications disabled.");
+    } catch (error) {
+      console.error("Failed to unsubscribe from push notifications", error);
+      toast.error("Failed to disable push notifications.");
+    } finally {
+      setIsPushSubscribing(false);
+    }
   }
 
   return (
@@ -263,8 +349,10 @@ export default function SettingsPage() {
               <Switch
                 id="push"
                 checked={pushEnabled}
-                onCheckedChange={setPushEnabledDraft}
-                disabled={!user || updatePreferences.isPending}
+                onCheckedChange={onTogglePush}
+                disabled={
+                  !user || updatePreferences.isPending || isPushSubscribing
+                }
               />
             </div>
             <div
@@ -329,7 +417,9 @@ export default function SettingsPage() {
 
         <Card className="rounded-2xl shadow-sm border-border/60">
           <CardHeader>
-            <CardTitle className="font-heading text-xl">Phone Setup</CardTitle>
+            <CardTitle className="font-heading text-xl">
+              WhatsApp Setup
+            </CardTitle>
             <CardDescription className="text-base">
               Verify your phone to enable WhatsApp delivery and security.
             </CardDescription>
@@ -344,7 +434,7 @@ export default function SettingsPage() {
                   id="phone"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumberDraft(e.target.value)}
-                  placeholder="+2348012345678"
+                  placeholder="08012345678"
                   className="rounded-xl h-11"
                   disabled={!user || requestPhoneVerification.isPending}
                 />
@@ -366,32 +456,34 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="phone-code" className="text-sm font-medium">
-                Verification Code
-              </Label>
-              <div className="flex gap-3">
-                <Input
-                  id="phone-code"
-                  value={phoneCode}
-                  onChange={(e) => setPhoneCode(e.target.value)}
-                  placeholder="123456"
-                  className="rounded-xl h-11"
-                  disabled={!user || confirmPhoneVerification.isPending}
-                />
-                <Button
-                  className="rounded-full px-6 shadow-sm"
-                  onClick={onConfirmPhoneCode}
-                  disabled={
-                    !user ||
-                    confirmPhoneVerification.isPending ||
-                    !phoneCode.trim()
-                  }
-                >
-                  Verify
-                </Button>
+            {isVerificationPending ? (
+              <div className="space-y-2 animate-in fade-in duration-300">
+                <Label htmlFor="phone-code" className="text-sm font-medium">
+                  Verification Code
+                </Label>
+                <div className="flex gap-3">
+                  <Input
+                    id="phone-code"
+                    value={phoneCode}
+                    onChange={(e) => setPhoneCode(e.target.value)}
+                    placeholder="123456"
+                    className="rounded-xl h-11"
+                    disabled={!user || confirmPhoneVerification.isPending}
+                  />
+                  <Button
+                    className="rounded-full px-6 shadow-sm"
+                    onClick={onConfirmPhoneCode}
+                    disabled={
+                      !user ||
+                      confirmPhoneVerification.isPending ||
+                      !phoneCode.trim()
+                    }
+                  >
+                    Verify
+                  </Button>
+                </div>
               </div>
-            </div>
+            ) : null}
           </CardContent>
         </Card>
 
