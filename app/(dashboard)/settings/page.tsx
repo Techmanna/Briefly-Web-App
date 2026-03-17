@@ -72,6 +72,7 @@ export default function SettingsPage() {
   >(null);
 
   const [phoneNumberDraft, setPhoneNumberDraft] = useState<string | null>(null);
+  const [nameDraft, setNameDraft] = useState<string | null>(null);
   const [phoneCode, setPhoneCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [isVerificationPending, setIsVerificationPending] = useState(false);
@@ -89,6 +90,7 @@ export default function SettingsPage() {
     telegramEnabledDraft ?? Boolean(user?.telegram_enabled);
 
   const phoneNumber = phoneNumberDraft ?? user?.phone ?? "";
+  const name = nameDraft ?? user?.name ?? "";
 
   const toggleCategoryId = (categoryId: string) => {
     setSelectedCategoryIdsDraft((prevDraft) => {
@@ -153,18 +155,30 @@ export default function SettingsPage() {
     }
   }
 
-  async function onUpdatePassword() {
-    if (!newPassword.trim()) return;
-    if (newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters long");
-      return;
-    }
+  async function onUpdateAccount() {
     try {
-      await setPassword.mutateAsync({ password: newPassword });
+      const promises = [];
+
+      if (newPassword.trim()) {
+        if (newPassword.length < 8) {
+          toast.error("Password must be at least 8 characters long");
+          return;
+        }
+        promises.push(setPassword.mutateAsync({ password: newPassword }));
+      }
+
+      if (nameDraft !== null && name.trim()) {
+        promises.push(updatePreferences.mutateAsync({ name: name.trim() }));
+      }
+
+      if (promises.length === 0) return;
+
+      await Promise.all(promises);
       setNewPassword("");
-      toast.success("Password updated");
+      setNameDraft(null);
+      toast.success("Account updated");
     } catch (e) {
-      toast.error((e as Error).message || "Failed to update password");
+      toast.error((e as Error).message || "Failed to update account");
     }
   }
 
@@ -519,9 +533,10 @@ export default function SettingsPage() {
               </Label>
               <Input
                 id="name"
-                value={user?.name ?? ""}
+                value={name}
+                onChange={(e) => setNameDraft(e.target.value)}
                 className="rounded-xl h-11"
-                disabled
+                disabled={updatePreferences.isPending}
               />
             </div>
             <div className="space-y-2">
@@ -556,11 +571,13 @@ export default function SettingsPage() {
             <Button
               variant="outline"
               className="rounded-full border-border/60 hover:bg-muted"
-              onClick={onUpdatePassword}
+              onClick={onUpdateAccount}
               disabled={
-                !newPassword.trim() ||
-                newPassword.length < 8 ||
-                setPassword.isPending
+                (newPassword.trim() === "" &&
+                  (nameDraft === null || name.trim() === "")) ||
+                (newPassword.trim() !== "" && newPassword.length < 8) ||
+                setPassword.isPending ||
+                updatePreferences.isPending
               }
             >
               Update Account

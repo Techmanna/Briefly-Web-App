@@ -37,6 +37,7 @@ export type UpdatePreferencesInput = {
   whatsappNumber?: string;
   telegramChatId?: string;
   pushToken?: string;
+  name?: string;
   categoryIds?: string[];
 };
 
