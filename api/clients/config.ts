@@ -4,5 +4,5 @@ export function getApiBaseUrl() {
     const base = env.trim().replace(/\/+$/, "");
     return base.endsWith("/v1") ? base.slice(0, -3) : base;
   }
-  return "http://localhost:3100";
+  return "https://briefly-api.techmanna.co";
 }
