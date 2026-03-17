@@ -144,6 +144,10 @@ export default function SettingsPage() {
 
   async function onUpdatePassword() {
     if (!newPassword.trim()) return;
+    if (newPassword.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      return;
+    }
     try {
       await setPassword.mutateAsync({ password: newPassword });
       setNewPassword("");
@@ -430,9 +434,23 @@ export default function SettingsPage() {
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="rounded-xl h-11"
+                className={cn(
+                  "rounded-xl h-11",
+                  newPassword && newPassword.length < 8
+                    ? "border-destructive focus-visible:ring-destructive"
+                    : "",
+                )}
                 disabled={setPassword.isPending}
               />
+              {newPassword && newPassword.length < 8 ? (
+                <p className="text-xs text-destructive">
+                  Password must be at least 8 characters long.
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Minimum 8 characters.
+                </p>
+              )}
             </div>
           </CardContent>
           <CardFooter className="border-t border-border/40 px-6 py-4 bg-muted/20 rounded-b-2xl flex justify-between">
@@ -440,7 +458,11 @@ export default function SettingsPage() {
               variant="outline"
               className="rounded-full border-border/60 hover:bg-muted"
               onClick={onUpdatePassword}
-              disabled={!newPassword.trim() || setPassword.isPending}
+              disabled={
+                !newPassword.trim() ||
+                newPassword.length < 8 ||
+                setPassword.isPending
+              }
             >
               Update Account
             </Button>

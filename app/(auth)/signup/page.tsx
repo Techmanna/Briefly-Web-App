@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useRegisterMutation } from "@/api";
 import { GoogleSignInButton } from "@/components/auth/google-signin-button";
 import { toast } from "@/lib/toast";
+import { WhatsAppIcon, TelegramIcon } from "@/components/icons";
 import { useAtomValue } from "jotai";
 import { authHydratedAtom } from "@/lib/auth/session-atom";
 import { useAuth } from "@/lib/auth/use-auth";
@@ -174,11 +175,27 @@ export default function SignupPage() {
           <GoogleSignInButton onSuccess={() => router.push("/onboarding")} />
 
           <div className="grid grid-cols-2 gap-3">
-            <Button asChild variant="outline" className="h-11 rounded-xl">
-              <Link href="/whatsapp">Continue with WhatsApp</Link>
+            <Button
+              asChild
+              variant="outline"
+              className="h-11 rounded-xl"
+              aria-label="Continue with WhatsApp"
+            >
+              <Link href="/whatsapp">
+                <WhatsAppIcon className="h-5 w-5 text-[#25D366]" />
+              </Link>
             </Button>
-            <Button asChild variant="outline" className="h-11 rounded-xl">
-              <Link href="/telegram">Continue with Telegram</Link>
+            <Button
+              asChild
+              variant="outline"
+              className="h-11 rounded-xl"
+              aria-label="Continue with Telegram"
+              disabled={true}
+            >
+              <Link href="#">
+                {/* /telegram */}
+                <TelegramIcon className="h-5 w-5 text-[#24A1DE]" />
+              </Link>
             </Button>
           </div>
         </CardContent>
