@@ -28,6 +28,7 @@ export const endpoints = {
   },
   digest: {
     latest: "/v1/digest/latest",
+    list: "/v1/digest/list",
     byDate: (date: string) => `/v1/digest/${date}`,
   },
 } as const;

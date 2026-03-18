@@ -16,3 +16,10 @@ export function useDigestByDateQuery(date: string) {
   });
 }
 
+export function useListDigestsQuery(page: number = 1, limit: number = 10) {
+  return useQuery({
+    queryKey: ["digest", "list", page, limit],
+    queryFn: () => digestClient.listDigests(page, limit),
+  });
+}
+

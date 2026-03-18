@@ -14,11 +14,11 @@ export function DashboardNav() {
       href: "/dashboard",
       icon: Home,
     },
-    // {
-    //   title: "Briefs",
-    //   href: "/briefs",
-    //   icon: FileText,
-    // },
+    {
+      title: "My Briefs",
+      href: "/briefs",
+      icon: FileText,
+    },
     {
       title: "Settings",
       href: "/settings",

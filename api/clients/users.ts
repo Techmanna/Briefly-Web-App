@@ -38,11 +38,15 @@ export type UpdatePreferencesInput = {
   telegramChatId?: string;
   pushToken?: string;
   name?: string;
+  email?: string;
   categoryIds?: string[];
 };
 
 export function getUser(id: string) {
-  return apiFetch<User>(endpoints.users.byId(id), { method: "GET", auth: true });
+  return apiFetch<User>(endpoints.users.byId(id), {
+    method: "GET",
+    auth: true,
+  });
 }
 
 export function updatePreferences(id: string, input: UpdatePreferencesInput) {
@@ -53,12 +57,18 @@ export function updatePreferences(id: string, input: UpdatePreferencesInput) {
   });
 }
 
-export function requestPhoneVerification(id: string, input: { phoneNumber: string }) {
-  return apiFetch<{ message: string }>(endpoints.users.verifyPhone.request(id), {
-    method: "POST",
-    body: input,
-    auth: true,
-  });
+export function requestPhoneVerification(
+  id: string,
+  input: { phoneNumber: string },
+) {
+  return apiFetch<{ message: string }>(
+    endpoints.users.verifyPhone.request(id),
+    {
+      method: "POST",
+      body: input,
+      auth: true,
+    },
+  );
 }
 
 export function confirmPhoneVerification(id: string, input: { code: string }) {
@@ -68,4 +78,3 @@ export function confirmPhoneVerification(id: string, input: { code: string }) {
     auth: true,
   });
 }
-

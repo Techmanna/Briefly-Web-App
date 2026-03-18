@@ -73,6 +73,7 @@ export default function SettingsPage() {
 
   const [phoneNumberDraft, setPhoneNumberDraft] = useState<string | null>(null);
   const [nameDraft, setNameDraft] = useState<string | null>(null);
+  const [emailDraft, setEmailDraft] = useState<string | null>(null);
   const [phoneCode, setPhoneCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [isVerificationPending, setIsVerificationPending] = useState(false);
@@ -91,6 +92,7 @@ export default function SettingsPage() {
 
   const phoneNumber = phoneNumberDraft ?? user?.phone ?? "";
   const name = nameDraft ?? user?.name ?? "";
+  const email = emailDraft ?? user?.email ?? "";
 
   const toggleCategoryId = (categoryId: string) => {
     setSelectedCategoryIdsDraft((prevDraft) => {
@@ -171,11 +173,16 @@ export default function SettingsPage() {
         promises.push(updatePreferences.mutateAsync({ name: name.trim() }));
       }
 
+      if (emailDraft !== null && email.trim()) {
+        promises.push(updatePreferences.mutateAsync({ email: email.trim() }));
+      }
+
       if (promises.length === 0) return;
 
       await Promise.all(promises);
       setNewPassword("");
       setNameDraft(null);
+      setEmailDraft(null);
       toast.success("Account updated");
     } catch (e) {
       toast.error((e as Error).message || "Failed to update account");
@@ -522,10 +529,17 @@ export default function SettingsPage() {
               </Label>
               <Input
                 id="email"
-                value={user?.email ?? ""}
+                value={email}
+                onChange={(e) => setEmailDraft(e.target.value)}
                 className="rounded-xl h-11"
-                disabled
+                disabled={Boolean(user?.email) || updatePreferences.isPending}
+                placeholder="Enter your email"
               />
+              {user?.email && (
+                <p className="text-[10px] text-muted-foreground ml-1">
+                  Email cannot be changed once set.
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">
@@ -574,7 +588,8 @@ export default function SettingsPage() {
               onClick={onUpdateAccount}
               disabled={
                 (newPassword.trim() === "" &&
-                  (nameDraft === null || name.trim() === "")) ||
+                  (nameDraft === null || name.trim() === "") &&
+                  (emailDraft === null || email.trim() === "")) ||
                 (newPassword.trim() !== "" && newPassword.length < 8) ||
                 setPassword.isPending ||
                 updatePreferences.isPending

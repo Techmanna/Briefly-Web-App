@@ -1,7 +1,7 @@
 import { DashboardNav } from "@/components/dashboard-nav";
 import { RequireAuth } from "@/components/auth/require-auth";
 import { RequireCategories } from "@/components/auth/require-categories";
-import { Home, Settings, User } from "lucide-react";
+import { FileText, Home, Settings, User } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardLayout({
@@ -36,13 +36,13 @@ export default function DashboardLayout({
                     <Home className="h-4 w-4" />
                     Dashboard
                   </Link>
-                  {/* <Link
+                  <Link
                     href="/briefs"
                     className="flex items-center gap-2 hover:text-primary transition-colors"
                   >
                     <FileText className="h-4 w-4" />
-                    Briefs
-                  </Link> */}
+                    My Briefs
+                  </Link>
                   <Link
                     href="/settings"
                     className="flex items-center gap-2 hover:text-primary transition-colors"

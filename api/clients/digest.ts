@@ -45,8 +45,35 @@ export type Digest = {
   items: DigestItem[];
 };
 
+export type PaginatedDigestResponse = {
+  items: Digest[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    total_pages: number;
+  };
+};
+
 export function getLatestDigest() {
-  return apiFetch<Digest>(endpoints.digest.latest, { method: "GET", auth: true });
+  return apiFetch<Digest>(endpoints.digest.latest, {
+    method: "GET",
+    auth: true,
+  });
+}
+
+export function listDigests(page: number = 1, limit: number = 10) {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  return apiFetch<PaginatedDigestResponse>(
+    `${endpoints.digest.list}?${params.toString()}`,
+    {
+      method: "GET",
+      auth: true,
+    },
+  );
 }
 
 export function getDigestByDate(date: string) {
