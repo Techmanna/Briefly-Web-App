@@ -51,3 +51,8 @@ export function clearSession() {
 export function getAccessToken(): string | null {
   return getSession()?.accessToken ?? null;
 }
+
+export function setAccessToken(token: string) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(TOKEN_KEY, token);
+}

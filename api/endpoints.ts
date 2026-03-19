@@ -31,4 +31,23 @@ export const endpoints = {
     list: "/v1/digest/list",
     byDate: (date: string) => `/v1/digest/${date}`,
   },
+  admin: {
+    auth: {
+      login: "/v1/admin/auth/login",
+      forgotPassword: "/v1/admin/auth/forgot-password",
+      profile: "/v1/admin/auth/profile",
+    },
+    stats: "/v1/admin/stats",
+    users: "/v1/admin/users",
+    logs: {
+      ingestion: "/v1/admin/logs/ingestion",
+      digest: "/v1/admin/logs/digest",
+    },
+    analytics: {
+      overview: "/v1/admin/analytics/overview",
+      aiUsage: "/v1/admin/analytics/ai-usage",
+      costBreakdown: "/v1/admin/analytics/cost-breakdown",
+      ingestion: "/v1/admin/analytics/ingestion",
+    },
+  },
 } as const;

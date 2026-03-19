@@ -52,6 +52,25 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}) {
       payload,
       res.statusText || "Request failed",
     );
+
+    // Auto-redirect if unauthorized or forbidden
+    if (typeof window !== "undefined") {
+      const isAdminPath = window.location.pathname.startsWith("/admin");
+      const isLoginRequest = path.includes("/auth/login");
+
+      if (!isLoginRequest) {
+        if (
+          (res.status === 403 &&
+            message.toLowerCase().includes("admin access required")) ||
+          (res.status === 401 && isAdminPath)
+        ) {
+          window.location.href = "/admin/login";
+        } else if (res.status === 401 && !isAdminPath) {
+          window.location.href = "/login";
+        }
+      }
+    }
+
     throw new ApiError(message, res.status, payload);
   }
 

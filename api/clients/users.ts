@@ -27,6 +27,10 @@ export type User = {
   created_at: string;
   updated_at: string;
   subscriptions?: Subscription[];
+  count: {
+    subscriptions: number;
+    digests: number;
+  };
 };
 
 export type UpdatePreferencesInput = {
