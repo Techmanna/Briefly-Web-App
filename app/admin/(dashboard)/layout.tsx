@@ -31,6 +31,11 @@ const navItems = [
     icon: Users,
   },
   {
+    title: "Sources",
+    href: "/admin/sources",
+    icon: Network,
+  },
+  {
     title: "AI Analytics",
     href: "/admin/analytics/ai",
     icon: BarChart3,
@@ -76,11 +81,12 @@ export default function AdminDashboardLayout({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-background border-r border-border/60 transition-transform duration-300 md:relative md:translate-x-0",
-          !isMobileMenuOpen && "-translate-x-full",
+          "fixed inset-y-0 left-0 z-50 w-64 bg-background border-r border-border/60 transition-transform duration-300 md:translate-x-0",
+          "h-screen overflow-hidden", // 👈 ADD THIS
+          !isMobileMenuOpen && "-translate-x-full md:translate-x-0",
         )}
       >
-        <div className="h-full flex flex-col p-6">
+        <div className="h-full flex flex-col p-6 overflow-hidden">
           <div className="flex items-center gap-3 mb-10 px-2">
             <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center">
               <ShieldCheck className="h-6 w-6 text-primary-foreground" />
@@ -95,7 +101,7 @@ export default function AdminDashboardLayout({
             </div>
           </div>
 
-          <nav className="flex-1 space-y-1">
+          <nav className="flex-1 space-y-1 overflow-y-auto pr-2">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -159,7 +165,7 @@ export default function AdminDashboardLayout({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-10 max-w-7xl mx-auto w-full">
+      <main className="flex-1 p-4 md:p-10 max-w-7xl mx-auto w-full md:ml-64">
         {children}
       </main>
 

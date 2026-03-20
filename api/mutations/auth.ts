@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation } from "@tanstack/react-query";
 import * as authClient from "@/api/clients/auth";
 import { useAuth } from "@/lib/auth/use-auth";
 
-function toSession(res: authClient.AuthResponse) {
+export function toSession(
+  res: authClient.AuthResponse | authClient.AuthAdminResponse | any,
+) {
   return { accessToken: res.access_token, user: res.user };
 }
 

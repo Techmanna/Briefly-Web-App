@@ -18,9 +18,21 @@ export type AuthUser = {
   push_token?: string | null;
 };
 
+export type AuthAdminUser = {
+  id: string;
+  email: string | null;
+  name: string | null;
+  role: string | null;
+};
+
 export type AuthResponse = {
   access_token: string;
   user: AuthUser;
+};
+
+export type AuthAdminResponse = {
+  access_token: string;
+  user: AuthAdminUser;
 };
 
 export type TelegramRegisterResponse = AuthResponse & {

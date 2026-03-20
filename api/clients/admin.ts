@@ -105,11 +105,13 @@ export type AdminUsersResponse = {
   };
 };
 
-export function getAdminUsers(page = 1, limit = 20) {
-  const params = new URLSearchParams({
+export function getAdminUsers(page = 1, limit = 20, search?: string) {
+  const query: Record<string, string> = {
     page: page.toString(),
     limit: limit.toString(),
-  });
+  };
+  if (search) query.search = search;
+  const params = new URLSearchParams(query);
   return apiFetch<AdminUsersResponse>(
     `${endpoints.admin.users}?${params.toString()}`,
     {
@@ -117,4 +119,19 @@ export function getAdminUsers(page = 1, limit = 20) {
       auth: true,
     },
   );
+}
+
+export function updateAdminUser(id: string, data: Partial<User>) {
+  return apiFetch<User>(`${endpoints.admin.users}/${id}`, {
+    method: "PATCH",
+    body: data,
+    auth: true,
+  });
+}
+
+export function deleteAdminUser(id: string) {
+  return apiFetch<{ message: string }>(`${endpoints.admin.users}/${id}`, {
+    method: "DELETE",
+    auth: true,
+  });
 }

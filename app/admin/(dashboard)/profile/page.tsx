@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { useUpdateAdminProfileMutation } from "@/api/queries/admin";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -38,19 +45,27 @@ export default function AdminProfilePage() {
   return (
     <div className="space-y-8 max-w-2xl">
       <div className="space-y-2">
-        <h1 className="text-3xl font-heading font-bold tracking-tight">Admin Profile</h1>
-        <p className="text-muted-foreground">Manage your administrative account settings.</p>
+        <h1 className="text-3xl font-heading font-bold tracking-tight">
+          Admin Profile
+        </h1>
+        <p className="text-muted-foreground">
+          Manage your administrative account settings.
+        </p>
       </div>
 
-      <Card className="border-border/60 shadow-sm rounded-3xl overflow-hidden">
+      <Card className="border-border shadow-none rounded-lg overflow-hidden">
         <CardHeader className="bg-secondary/20 pb-8">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
               <ShieldCheck className="h-8 w-8 text-primary" />
             </div>
             <div className="space-y-1">
-              <CardTitle className="text-2xl font-heading font-bold">Account Settings</CardTitle>
-              <CardDescription>Update your name, email, or password.</CardDescription>
+              <CardTitle className="text-2xl font-heading font-bold">
+                Account Settings
+              </CardTitle>
+              <CardDescription>
+                Update your name, email, or password.
+              </CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -99,12 +114,14 @@ export default function AdminProfilePage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="rounded-xl h-11"
               />
-              <p className="text-[10px] text-muted-foreground ml-1">Must be at least 8 characters long.</p>
+              <p className="text-[10px] text-muted-foreground ml-1">
+                Must be at least 8 characters long.
+              </p>
             </div>
           </CardContent>
           <CardFooter className="bg-secondary/10 px-6 py-4 flex justify-end">
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="rounded-xl h-11 px-8 font-bold"
               disabled={updateMutation.isPending}
             >

@@ -5,9 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Send, Calendar, CheckCircle2, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function DigestLogsPage() {
-  const { data: logs, isLoading } = useDigestLogsQuery();
+  const [page, setPage] = useState(1);
+  const { data: result, isLoading } = useDigestLogsQuery(page, 50);
 
   if (isLoading) {
     return (
@@ -29,7 +32,7 @@ export default function DigestLogsPage() {
         </p>
       </div>
 
-      <Card className="border-border/60 shadow-sm rounded-3xl overflow-hidden">
+      <Card className="border-border shadow-none rounded-lg overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
@@ -42,7 +45,7 @@ export default function DigestLogsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
-                {logs?.map((log) => (
+                {result?.map((log) => (
                   <tr
                     key={log.id}
                     className="hover:bg-secondary/20 transition-colors group"
@@ -90,7 +93,7 @@ export default function DigestLogsPage() {
                     </td>
                   </tr>
                 ))}
-                {logs?.length === 0 && (
+                {result?.length === 0 && (
                   <tr>
                     <td colSpan={4} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center gap-2 text-muted-foreground">
@@ -105,6 +108,34 @@ export default function DigestLogsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* {result?.meta && result.meta.totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 pt-4 pb-10">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-xl border-border/60"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </Button>
+          <span className="text-sm font-medium">
+            Page {page} of {result.meta.totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-xl border-border/60"
+            onClick={() =>
+              setPage((p) => Math.min(result.meta.totalPages, p + 1))
+            }
+            disabled={page === result.meta.totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )} */}
     </div>
   );
 }

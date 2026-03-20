@@ -49,5 +49,10 @@ export const endpoints = {
       costBreakdown: "/v1/admin/analytics/cost-breakdown",
       ingestion: "/v1/admin/analytics/ingestion",
     },
+    sources: {
+      list: "/v1/admin/news-source",
+      create: "/v1/admin/news-source",
+      byId: (id: string) => `/v1/admin/news-source/${id}`,
+    },
   },
 } as const;

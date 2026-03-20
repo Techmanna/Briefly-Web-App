@@ -109,7 +109,7 @@ export default function AdminDashboardPage() {
         {statCards.map((card) => (
           <Card
             key={card.title}
-            className="border-border/60 shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-shadow"
+            className="border-border shadow-none rounded-lg overflow-hidden hover:shadow-md transition-shadow"
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
@@ -133,7 +133,7 @@ export default function AdminDashboardPage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Delivery Breakdown */}
-        <Card className="lg:col-span-2 border-border/60 shadow-sm rounded-3xl">
+        <Card className="lg:col-span-2 border-border shadow-none rounded-lg">
           <CardHeader>
             <CardTitle className="font-heading text-xl">
               Delivery Channels
@@ -182,7 +182,7 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* System Health */}
-        <Card className="border-border/60 shadow-sm rounded-3xl">
+        <Card className="border-border shadow-none rounded-lg">
           <CardHeader>
             <CardTitle className="font-heading text-xl">
               Database Summary
