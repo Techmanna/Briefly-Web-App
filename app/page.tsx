@@ -70,10 +70,10 @@ export default function LandingPage() {
         {/* Hero Section */}
         <section className="relative overflow-hidden pt-16 md:pt-24 lg:pt-32 pb-16">
           <div className="container mx-auto px-6 max-w-screen-lg text-center">
-            <div className="inline-flex items-center rounded-full border border-border bg-muted/50 px-3 py-1 text-sm font-medium text-muted-foreground backdrop-blur-sm mb-8 animate-fade-in">
+            {/* <div className="inline-flex items-center rounded-full border border-border bg-muted/50 px-3 py-1 text-sm font-medium text-muted-foreground backdrop-blur-sm mb-8 animate-fade-in">
               <span className="flex h-2 w-2 rounded-full bg-primary mr-2"></span>
               Briefly v1.0 is now live
-            </div>
+            </div> */}
             <h1 className="font-heading text-4xl font-bold tracking-tight text-foreground sm:text-6xl md:text-7xl lg:text-8xl mb-6 text-balance animate-slide-up">
               Know what matters.
               <br className="hidden md:block" /> In 20 seconds.
@@ -94,7 +94,7 @@ export default function LandingPage() {
                 size="lg"
                 className="h-12 px-8 rounded-full text-base shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/20 transition-all duration-300 w-full sm:w-auto"
               >
-                <Link href="/signup">Start Your Briefing</Link>
+                <Link href="?auth=signup">Start Your Briefing</Link>
               </Button>
               <Button
                 asChild
@@ -102,7 +102,7 @@ export default function LandingPage() {
                 size="lg"
                 className="h-12 px-8 rounded-full text-base bg-transparent border-border hover:bg-muted/50 w-full sm:w-auto"
               >
-                <Link href="/login">Log In</Link>
+                <Link href="?auth=login">Log In</Link>
               </Button>
             </div>
           </div>

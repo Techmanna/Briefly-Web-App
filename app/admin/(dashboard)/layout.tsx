@@ -82,11 +82,11 @@ export default function AdminDashboardLayout({
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-64 bg-background border-r border-border/60 transition-transform duration-300 md:translate-x-0",
-          "h-screen overflow-hidden", // 👈 ADD THIS
+          "h-screen",
           !isMobileMenuOpen && "-translate-x-full md:translate-x-0",
         )}
       >
-        <div className="h-full flex flex-col p-6 overflow-hidden">
+        <div className="h-full flex flex-col p-6">
           <div className="flex items-center gap-3 mb-10 px-2">
             <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center">
               <ShieldCheck className="h-6 w-6 text-primary-foreground" />

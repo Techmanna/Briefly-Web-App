@@ -18,9 +18,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLoginMutation } from "@/api";
-import { GoogleSignInButton } from "@/components/auth/google-signin-button";
 import { toast } from "@/lib/toast";
-import { WhatsAppIcon, TelegramIcon } from "@/components/icons";
 import { useAtomValue } from "jotai";
 import { authHydratedAtom } from "@/lib/auth/session-atom";
 import { useAuth } from "@/lib/auth/use-auth";
@@ -125,50 +123,12 @@ export default function LoginPage() {
                 : "Sign In"}
             </Button>
           </form>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border/60" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground/80 font-medium">
-                Or continue with
-              </span>
-            </div>
-          </div>
-
-          <GoogleSignInButton onSuccess={() => router.push("/dashboard")} />
-
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              asChild
-              variant="outline"
-              className="h-11 rounded-xl"
-              aria-label="Continue with WhatsApp"
-            >
-              <Link href="/whatsapp">
-                <WhatsAppIcon className="h-5 w-5 text-[#25D366]" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="h-11 rounded-xl"
-              aria-label="Continue with Telegram"
-              disabled={true}
-            >
-              <Link href="#">
-                {/* /telegram */}
-                <TelegramIcon className="h-5 w-5 text-[#24A1DE]" />
-              </Link>
-            </Button>
-          </div>
         </CardContent>
         <CardFooter className="justify-center pb-8 border-t border-border/40 pt-6">
           <p className="text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link
-              href="/signup"
+              href="?auth=signup"
               className="font-semibold text-primary hover:underline underline-offset-4 transition-all"
             >
               Sign up

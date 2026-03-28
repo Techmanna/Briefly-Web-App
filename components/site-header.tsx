@@ -10,7 +10,7 @@ export function SiteHeader() {
         </div>
         <nav className="flex items-center gap-6">
           <Link
-            href="/login"
+            href="?auth=login"
             className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             Login
@@ -20,7 +20,7 @@ export function SiteHeader() {
             size="sm"
             className="rounded-xl px-6 font-medium shadow-sm hover:shadow-md transition-all duration-300"
           >
-            <Link href="/signup">Sign Up Free</Link>
+            <Link href="?auth=signup">Sign Up Free</Link>
           </Button>
         </nav>
       </div>

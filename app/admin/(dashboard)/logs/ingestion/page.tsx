@@ -11,12 +11,9 @@ import {
   Info,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 
 export default function IngestionLogsPage() {
-  const [page, setPage] = useState(1);
-  const { data: result, isLoading } = useIngestionLogsQuery(page, 50);
+  const { data: result, isLoading } = useIngestionLogsQuery(1, 50);
 
   if (isLoading) {
     return (
@@ -112,34 +109,6 @@ export default function IngestionLogsPage() {
           </div>
         </CardContent>
       </Card>
-
-      {/* {result?.meta && result.meta.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 pt-4 pb-10">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-xl border-border/60"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-          >
-            Previous
-          </Button>
-          <span className="text-sm font-medium">
-            Page {page} of {result.meta.totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-xl border-border/60"
-            onClick={() =>
-              setPage((p) => Math.min(result.meta.totalPages, p + 1))
-            }
-            disabled={page === result.meta.totalPages}
-          >
-            Next
-          </Button>
-        </div>
-      )} */}
     </div>
   );
 }
