@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { WhatsAppIcon, TelegramIcon } from "@/components/icons";
+import { WhatsAppIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/toast";
 import {
@@ -217,14 +217,14 @@ export function AuthChoiceModal({ open, mode, onClose }: Props) {
                   <WhatsAppIcon className="h-5 w-5 text-[#25D366]" />
                   Continue with WhatsApp
                 </Button>
-                <Button
+                {/* <Button
                   variant="outline"
                   className="h-12 rounded-2xl justify-center gap-3 text-base"
                   onClick={goToTelegram}
                 >
                   <TelegramIcon className="h-5 w-5 text-[#24A1DE]" />
                   Continue with Telegram
-                </Button>
+                </Button> */}
                 <Button
                   variant="outline"
                   className="h-12 rounded-2xl justify-center text-base"

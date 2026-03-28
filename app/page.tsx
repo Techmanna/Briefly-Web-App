@@ -263,7 +263,7 @@ export default function LandingPage() {
               size="lg"
               className="h-14 px-10 rounded-full text-lg shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 transition-all duration-300"
             >
-              <Link href="/signup">Get Started for Free</Link>
+              <Link href="?auth=signup">Get Started for Free</Link>
             </Button>
           </div>
         </section>

@@ -66,7 +66,7 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}) {
         ) {
           window.location.href = "/admin/login";
         } else if (res.status === 401 && !isAdminPath) {
-          window.location.href = "/login";
+          window.location.href = "/";
         }
       }
     }

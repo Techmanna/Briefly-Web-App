@@ -21,9 +21,16 @@ export function AuthModalRouterGate() {
     router.replace(qs ? `${pathname}?${qs}` : pathname);
   }, [pathname, router, searchParams]);
 
+  const closeAndGoDashboard = useCallback(() => {
+    close();
+    router.replace("/dashboard");
+  }, [close, router]);
+
   useEffect(() => {
-    if (open && isAuthenticated) close();
-  }, [close, isAuthenticated, open]);
+    if (open && isAuthenticated) {
+      closeAndGoDashboard();
+    }
+  }, [closeAndGoDashboard, isAuthenticated, open]);
 
   const resolvedMode = useMemo(() => {
     if (mode === "signup") return "signup";

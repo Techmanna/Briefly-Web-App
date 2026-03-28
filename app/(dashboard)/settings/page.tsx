@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,6 +33,7 @@ import { getToken, deleteToken } from "firebase/messaging";
 
 export default function SettingsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const { session, clearSession } = useAuth();
   const userId = session?.user.id ?? "";
@@ -78,6 +79,17 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState("");
   const [isVerificationPending, setIsVerificationPending] = useState(false);
   const [isPushSubscribing, setIsPushSubscribing] = useState(false);
+
+  const section = searchParams.get("section");
+
+  useEffect(() => {
+    if (section !== "whatsapp") return;
+    const el = document.getElementById("whatsapp-setup");
+    if (!el) return;
+    window.setTimeout(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  }, [section]);
 
   const selectedCategoryIds =
     selectedCategoryIdsDraft ??
@@ -193,7 +205,7 @@ export default function SettingsPage() {
     clearSession();
     queryClient.clear();
     toast.success("Logged out");
-    router.push("/login");
+    router.push("/");
   }
 
   async function onTogglePush(enabled: boolean) {
@@ -443,7 +455,10 @@ export default function SettingsPage() {
           </CardFooter>
         </Card>
 
-        <Card className="rounded-2xl shadow-sm border-border/60">
+        <Card
+          id="whatsapp-setup"
+          className="rounded-2xl shadow-sm border-border/60"
+        >
           <CardHeader>
             <CardTitle className="font-heading text-xl">
               WhatsApp Setup
