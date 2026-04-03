@@ -55,18 +55,22 @@ export type PaginatedDigestResponse = {
   };
 };
 
-export function getLatestDigest() {
-  return apiFetch<Digest>(endpoints.digest.latest, {
+export type Language = "en" | "pidgin" | "yoruba" | "hausa" | "igbo";
+
+export function getLatestDigest(lang?: Language) {
+  const qs = lang ? `?lang=${encodeURIComponent(lang)}` : "";
+  return apiFetch<Digest>(`${endpoints.digest.latest}${qs}`, {
     method: "GET",
     auth: true,
   });
 }
 
-export function listDigests(page: number = 1, limit: number = 10) {
+export function listDigests(page: number = 1, limit: number = 10, lang?: Language) {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
   });
+  if (lang) params.set("lang", lang);
   return apiFetch<PaginatedDigestResponse>(
     `${endpoints.digest.list}?${params.toString()}`,
     {
@@ -76,7 +80,10 @@ export function listDigests(page: number = 1, limit: number = 10) {
   );
 }
 
-export function getDigestByDate(date: string) {
-  return apiFetch<Digest>(endpoints.digest.byDate(date), { method: "GET", auth: true });
+export function getDigestByDate(date: string, lang?: Language) {
+  const qs = lang ? `?lang=${encodeURIComponent(lang)}` : "";
+  return apiFetch<Digest>(`${endpoints.digest.byDate(date)}${qs}`, {
+    method: "GET",
+    auth: true,
+  });
 }
-

@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { ExternalLink, MessageCircle, X } from "lucide-react";
+import { ExternalLink, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { digestClient, usersClient } from "@/api";
@@ -26,19 +26,24 @@ export default function DashboardPage() {
 
   const mode = "latest";
 
-  const query = useQuery({
-    queryKey: ["digest", mode, dateParam || "latest"],
-    queryFn: () =>
-      mode === "latest"
-        ? digestClient.getLatestDigest()
-        : digestClient.getDigestByDate(dateParam),
-    enabled: mode === "latest" || Boolean(dateParam),
-  });
-
   const userQuery = useQuery({
     queryKey: ["user", userId],
     queryFn: () => usersClient.getUser(userId),
     enabled: Boolean(userId),
+  });
+
+  const lang =
+    userQuery.data?.language_preference ??
+    session?.user.language_preference ??
+    "en";
+
+  const query = useQuery({
+    queryKey: ["digest", mode, dateParam || "latest", lang],
+    queryFn: () =>
+      mode === "latest"
+        ? digestClient.getLatestDigest(lang)
+        : digestClient.getDigestByDate(dateParam, lang),
+    enabled: mode === "latest" || Boolean(dateParam),
   });
 
   const [isWhatsappAlertClosed, setIsWhatsappAlertClosed] = useState(false);

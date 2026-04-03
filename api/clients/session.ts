@@ -8,6 +8,7 @@ export type AuthUser = {
   name: string | null;
   provider: string;
   provider_id: string | null;
+  language_preference?: "en" | "pidgin" | "yoruba" | "hausa" | "igbo";
   is_phone_verified?: boolean;
   email_enabled?: boolean;
   push_enabled?: boolean;

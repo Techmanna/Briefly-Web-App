@@ -16,6 +16,7 @@ export type User = {
   provider_id: string | null;
   phone: string | null;
   is_phone_verified: boolean;
+  language_preference: "en" | "pidgin" | "yoruba" | "hausa" | "igbo";
   email_enabled: boolean;
   push_enabled: boolean;
   whatsapp_enabled: boolean;
@@ -44,6 +45,7 @@ export type UpdatePreferencesInput = {
   name?: string;
   email?: string;
   categoryIds?: string[];
+  languagePreference?: "en" | "pidgin" | "yoruba" | "hausa" | "igbo";
 };
 
 export function getUser(id: string) {
