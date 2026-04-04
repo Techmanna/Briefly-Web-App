@@ -18,6 +18,9 @@ export const endpoints = {
   categories: {
     list: "/v1/categories",
   },
+  interests: {
+    list: "/v1/interests",
+  },
   users: {
     byId: (id: string) => `/v1/users/${id}`,
     preferences: (id: string) => `/v1/users/${id}/preferences`,
@@ -25,11 +28,22 @@ export const endpoints = {
       request: (id: string) => `/v1/users/${id}/verify-phone/request`,
       confirm: (id: string) => `/v1/users/${id}/verify-phone/confirm`,
     },
+    feedbackPreferences: {
+      list: (id: string) => `/v1/users/${id}/feedback-preferences`,
+      unmuteCategory: (id: string, categoryId: string) =>
+        `/v1/users/${id}/feedback-preferences/categories/${categoryId}`,
+      unmuteSource: (id: string, sourceId: string) =>
+        `/v1/users/${id}/feedback-preferences/sources/${sourceId}`,
+    },
   },
   digest: {
     latest: "/v1/digest/latest",
     list: "/v1/digest/list",
     byDate: (date: string) => `/v1/digest/${date}`,
+  },
+  news: {
+    list: "/v1/news",
+    feedback: (id: string) => `/v1/news/${id}/feedback`,
   },
   admin: {
     auth: {
@@ -52,7 +66,12 @@ export const endpoints = {
     sources: {
       list: "/v1/admin/news-source",
       create: "/v1/admin/news-source",
+      bulk: "/v1/admin/news-source/bulk",
       byId: (id: string) => `/v1/admin/news-source/${id}`,
+    },
+    interests: {
+      list: "/v1/admin/interests",
+      byId: (id: string) => `/v1/admin/interests/${id}`,
     },
   },
 } as const;

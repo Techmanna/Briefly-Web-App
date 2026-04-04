@@ -42,6 +42,18 @@ export type DigestLog = {
   status: string;
 };
 
+export type AdminInterest = {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  rank: number;
+  is_active: boolean;
+  category_id?: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export function adminLogin(input: { email: string; password: string }) {
   return apiFetch<AdminLoginResponse>(endpoints.admin.auth.login, {
     method: "POST",
@@ -133,5 +145,23 @@ export function deleteAdminUser(id: string) {
   return apiFetch<{ message: string }>(`${endpoints.admin.users}/${id}`, {
     method: "DELETE",
     auth: true,
+  });
+}
+
+export function listAdminInterests() {
+  return apiFetch<AdminInterest[]>(endpoints.admin.interests.list, {
+    method: "GET",
+    auth: true,
+  });
+}
+
+export function updateAdminInterest(
+  id: string,
+  input: { rank?: number; isActive?: boolean },
+) {
+  return apiFetch<AdminInterest>(endpoints.admin.interests.byId(id), {
+    method: "PATCH",
+    auth: true,
+    body: input,
   });
 }

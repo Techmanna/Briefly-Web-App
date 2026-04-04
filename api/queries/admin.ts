@@ -70,3 +70,27 @@ export function useUpdateAdminProfileMutation() {
       adminClient.updateAdminProfile(input),
   });
 }
+
+export function useAdminInterestsQuery() {
+  return useQuery({
+    queryKey: ["admin", "interests"],
+    queryFn: () => adminClient.listAdminInterests(),
+  });
+}
+
+export function useUpdateAdminInterestMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      input,
+    }: {
+      id: string;
+      input: { rank?: number; isActive?: boolean };
+    }) => adminClient.updateAdminInterest(id, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "interests"] });
+      queryClient.invalidateQueries({ queryKey: ["interests"] });
+    },
+  });
+}

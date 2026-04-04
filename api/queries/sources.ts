@@ -48,3 +48,14 @@ export function useDeleteSourceMutation() {
     },
   });
 }
+
+export function useBulkCreateSourcesMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: sourcesClient.BulkCreateSourcesInput) =>
+      sourcesClient.bulkCreateSources(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "sources"] });
+    },
+  });
+}

@@ -50,6 +50,9 @@ export function register(input: {
   name: string;
   email: string;
   password: string;
+  country?: string;
+  region?: string;
+  topics?: string[];
 }) {
   return apiFetch<AuthResponse>(endpoints.auth.register, {
     method: "POST",

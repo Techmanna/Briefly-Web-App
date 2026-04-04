@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import {
-  categoriesClient,
+  interestsClient,
   useUpdatePreferencesMutation,
   usersClient,
 } from "@/api";
@@ -29,9 +29,9 @@ export default function OnboardingPage() {
   const [selected, setSelected] = useState<string[]>([]);
   const hasInitializedRef = useRef(false);
 
-  const categoriesQuery = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => categoriesClient.listCategories(),
+  const interestsQuery = useQuery({
+    queryKey: ["interests"],
+    queryFn: () => interestsClient.listInterests(),
   });
 
   const userQuery = useQuery({
@@ -44,20 +44,16 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (userQuery.data?.subscriptions && !hasInitializedRef.current) {
-      const initialSelected = userQuery.data.subscriptions.map(
-        (s) => s.category_id,
-      );
+      const initialSelected = (userQuery.data.interests ?? []).slice(0, 20);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelected(initialSelected);
       hasInitializedRef.current = true;
     }
   }, [userQuery.data]);
 
-  const toggleCategory = (categoryId: string) => {
+  const toggleTopic = (slug: string) => {
     setSelected((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId],
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug],
     );
   };
 
@@ -68,15 +64,15 @@ export default function OnboardingPage() {
     }
 
     try {
-      await updatePreferences.mutateAsync({ categoryIds: selected });
+      await updatePreferences.mutateAsync({ topics: selected });
       toast.success("Preferences saved!");
-      router.push("/dashboard");
+      router.push("/news");
     } catch (e) {
       toast.error((e as Error).message || "Failed to save preferences");
     }
   };
 
-  const categories = categoriesQuery.data ?? [];
+  const interests = interestsQuery.data ?? [];
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 bg-background relative overflow-hidden">
@@ -100,34 +96,34 @@ export default function OnboardingPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-8">
-            {categoriesQuery.isLoading ? (
+            {interestsQuery.isLoading ? (
               <div className="flex justify-center p-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {categories.map((category) => (
+                {interests.map((interest) => (
                   <div
-                    key={category.id}
+                    key={interest.id}
                     className={cn(
                       "group flex items-center space-x-3 rounded-xl border border-border/50 p-4 cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary/20",
-                      selected.includes(category.id)
+                      selected.includes(interest.slug)
                         ? "border-primary bg-primary/5 shadow-sm ring-1 ring-primary/10"
                         : "bg-background/50 hover:bg-background",
                     )}
-                    onClick={() => toggleCategory(category.id)}
+                    onClick={() => toggleTopic(interest.slug)}
                   >
                     <Checkbox
-                      id={category.id}
-                      checked={selected.includes(category.id)}
-                      onCheckedChange={() => toggleCategory(category.id)}
+                      id={interest.slug}
+                      checked={selected.includes(interest.slug)}
+                      onCheckedChange={() => toggleTopic(interest.slug)}
                       className="data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all duration-200"
                     />
                     <Label
-                      htmlFor={category.id}
+                      htmlFor={interest.slug}
                       className="cursor-pointer font-medium text-sm group-hover:text-primary transition-colors"
                     >
-                      {category.name}
+                      {interest.name}
                     </Label>
                   </div>
                 ))}

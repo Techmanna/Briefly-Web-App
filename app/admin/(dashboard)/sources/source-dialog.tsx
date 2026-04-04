@@ -39,6 +39,8 @@ export function SourceDialog({ isOpen, onClose, sourceId }: SourceDialogProps) {
     name: "",
     url: "",
     rssUrl: "",
+    country: "",
+    region: "",
     credibilityScore: 5,
   });
 
@@ -51,6 +53,8 @@ export function SourceDialog({ isOpen, onClose, sourceId }: SourceDialogProps) {
             name: source.name,
             url: source.url,
             rssUrl: source.rss_url || "",
+            country: source.country || "",
+            region: source.region || "",
             credibilityScore: source.credibility_score,
           });
         }, 0);
@@ -60,6 +64,8 @@ export function SourceDialog({ isOpen, onClose, sourceId }: SourceDialogProps) {
             name: "",
             url: "",
             rssUrl: "",
+            country: "",
+            region: "",
             credibilityScore: 5,
           });
         }, 0);
@@ -75,6 +81,8 @@ export function SourceDialog({ isOpen, onClose, sourceId }: SourceDialogProps) {
         name: formData.name,
         url: formData.url,
         ...(formData.rssUrl ? { rssUrl: formData.rssUrl } : {}),
+        ...(formData.country ? { country: formData.country } : {}),
+        ...(formData.region ? { region: formData.region } : {}),
         credibilityScore: Number(formData.credibilityScore),
       };
 
@@ -157,6 +165,33 @@ export function SourceDialog({ isOpen, onClose, sourceId }: SourceDialogProps) {
                   }
                   className="rounded-xl h-11"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="country">Country (Optional)</Label>
+                  <Input
+                    id="country"
+                    placeholder="Nigeria / Global"
+                    value={formData.country}
+                    onChange={(e) =>
+                      setFormData({ ...formData, country: e.target.value })
+                    }
+                    className="rounded-xl h-11"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="region">Region (Optional)</Label>
+                  <Input
+                    id="region"
+                    placeholder="Africa / Europe"
+                    value={formData.region}
+                    onChange={(e) =>
+                      setFormData({ ...formData, region: e.target.value })
+                    }
+                    className="rounded-xl h-11"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">

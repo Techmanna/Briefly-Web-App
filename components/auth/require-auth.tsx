@@ -15,7 +15,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hydrated) return;
     if (isAuthenticated) return;
-    router.replace("/login");
+    router.replace("?auth=login");
   }, [hydrated, isAuthenticated, router]);
 
   if (!hydrated) return null;

@@ -23,7 +23,7 @@ export function AuthModalRouterGate() {
 
   const closeAndGoDashboard = useCallback(() => {
     close();
-    router.replace("/dashboard");
+    router.replace("/news");
   }, [close, router]);
 
   useEffect(() => {

@@ -2,21 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  ArrowLeft,
-  ExternalLink,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { useListDigestsQuery } from "@/api";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DigestNewsItem } from "@/components/briefs/digest-news-item";
 
 function formatDate(value: string) {
   const d = new Date(value);
@@ -90,7 +81,7 @@ export default function BriefsPage() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" asChild className="-ml-2 h-8">
-              <Link href="/dashboard">
+              <Link href="/news">
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back
               </Link>
             </Button>
@@ -127,44 +118,18 @@ export default function BriefsPage() {
                   const title = item.news?.title ?? "Untitled";
                   const summary = item.news?.summary ?? "";
                   const url = item.news?.url?.trim() || undefined;
+                  const newsId = item.news?.id;
 
                   return (
-                    <Card
+                    <DigestNewsItem
                       key={item.id}
-                      className="border-border/50 shadow-sm rounded-2xl overflow-hidden hover:border-primary/20 transition-colors"
-                    >
-                      <CardHeader className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold text-primary uppercase tracking-wider bg-primary/5 border border-primary/10 px-2 py-1 rounded-md">
-                            {category}
-                          </span>
-                          <span className="text-xs text-muted-foreground font-medium">
-                            {source}
-                          </span>
-                        </div>
-                        <CardTitle className="font-heading text-lg leading-tight">
-                          {title}
-                        </CardTitle>
-                        <CardDescription className="text-base text-foreground/70">
-                          {summary || "Open to read the full story."}
-                        </CardDescription>
-                        {url ? (
-                          <div className="pt-2">
-                            <Button
-                              asChild
-                              variant="outline"
-                              size="sm"
-                              className="rounded-full px-4 text-xs h-8 border-border/60 hover:bg-primary/5 hover:text-primary hover:border-primary/30"
-                            >
-                              <a href={url} target="_blank" rel="noreferrer">
-                                Read Full Story{" "}
-                                <ExternalLink className="ml-2 h-3 w-3" />
-                              </a>
-                            </Button>
-                          </div>
-                        ) : null}
-                      </CardHeader>
-                    </Card>
+                      category={category}
+                      source={source}
+                      title={title}
+                      summary={summary}
+                      url={url}
+                      newsId={newsId}
+                    />
                   );
                 })}
               </div>

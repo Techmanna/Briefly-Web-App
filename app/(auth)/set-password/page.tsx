@@ -52,7 +52,7 @@ export default function SetPasswordPage() {
     try {
       await mutation.mutateAsync({ password: data.password });
       toast.success("Password saved");
-      router.push("/dashboard");
+      router.push("/news");
     } catch (e) {
       toast.error((e as Error).message || "Failed to save password");
     }

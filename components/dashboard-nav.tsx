@@ -11,7 +11,7 @@ export function DashboardNav() {
   const items = [
     {
       title: "Home",
-      href: "/dashboard",
+      href: "/news",
       icon: Home,
     },
     {

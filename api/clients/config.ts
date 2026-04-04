@@ -14,7 +14,4 @@ export function getVAPIDkey() {
     env ||
     "BACv1jOp-TTx9O85VTKQHBWx7Xn4osWX66th77qpTNmuISCTx2enov6cPmwT6TIYv8kKTgbCMlcR_5AIg5dSFwI"
   );
-
-  // Private Key:
-  // Q3lWTjkz7FIWif50FuSTDPcwq0V33mTnOsaSlTkWiuk;
 }

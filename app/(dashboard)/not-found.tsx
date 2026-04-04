@@ -22,9 +22,9 @@ export default function NotFound() {
 
         <div className="mt-6 flex flex-col sm:flex-row gap-3">
           <Button asChild className="rounded-full px-6">
-            <Link href="/dashboard">
+            <Link href="/news">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to dashboard
+              Back to news
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full px-6">

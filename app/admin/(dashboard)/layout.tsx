@@ -13,6 +13,7 @@ import {
   History,
   BarChart3,
   Network,
+  Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,11 @@ const navItems = [
     title: "Sources",
     href: "/admin/sources",
     icon: Network,
+  },
+  {
+    title: "Interests",
+    href: "/admin/interests",
+    icon: Tag,
   },
   {
     title: "AI Analytics",

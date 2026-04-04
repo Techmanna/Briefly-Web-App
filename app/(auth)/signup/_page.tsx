@@ -39,7 +39,7 @@ export default function SignupPage() {
   useEffect(() => {
     if (!hydrated) return;
     if (!isAuthenticated) return;
-    router.replace("/dashboard");
+    router.replace("/news");
   }, [hydrated, isAuthenticated, router]);
 
   if (!hydrated) return null;

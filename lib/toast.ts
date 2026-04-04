@@ -5,6 +5,10 @@ export type ToastItem = {
   variant: ToastVariant;
   message: string;
   description?: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
   duration: number;
 };
 
@@ -34,6 +38,10 @@ function genId() {
 type ToastInput = {
   description?: string;
   duration?: number;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
 };
 
 function addToast(variant: ToastVariant, message: string, input?: ToastInput) {
@@ -44,6 +52,7 @@ function addToast(variant: ToastVariant, message: string, input?: ToastInput) {
     variant,
     message,
     description: input?.description,
+    action: input?.action,
     duration,
   };
 
@@ -75,4 +84,3 @@ export const toast = {
     addToast("info", message, input),
   dismiss: (id: string) => dismissToast(id),
 };
-

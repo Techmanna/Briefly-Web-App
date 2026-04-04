@@ -94,7 +94,7 @@ export default function LandingPage() {
                 size="lg"
                 className="h-12 px-8 rounded-full text-base shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/20 transition-all duration-300 w-full sm:w-auto"
               >
-                <Link href="?auth=signup">Start Your Briefing</Link>
+                <Link href="/news">Start Your Briefing</Link>
               </Button>
               <Button
                 asChild
@@ -189,7 +189,7 @@ export default function LandingPage() {
                     className="w-full text-muted-foreground hover:text-primary hover:bg-muted/50"
                     asChild
                   >
-                    <Link href="/signup">
+                    <Link href="/news">
                       Read full brief <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -201,7 +201,7 @@ export default function LandingPage() {
 
         {/* Features / How it works */}
         <section className="bg-muted/30 py-24 border-t border-border/50">
-          <div className="container mx-auto px-6 max-w-screen-lg">
+          <div className="container mx-auto px-6 max-w-5xl">
             <div className="text-center mb-16">
               <h2 className="font-heading text-3xl font-bold md:text-4xl lg:text-5xl mb-4">
                 How it works

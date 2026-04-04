@@ -17,6 +17,9 @@ export type User = {
   phone: string | null;
   is_phone_verified: boolean;
   language_preference: "en" | "pidgin" | "yoruba" | "hausa" | "igbo";
+  country?: string | null;
+  region?: string | null;
+  interests?: string[] | null;
   email_enabled: boolean;
   push_enabled: boolean;
   whatsapp_enabled: boolean;
@@ -45,7 +48,32 @@ export type UpdatePreferencesInput = {
   name?: string;
   email?: string;
   categoryIds?: string[];
+  topics?: string[];
   languagePreference?: "en" | "pidgin" | "yoruba" | "hausa" | "igbo";
+  country?: string;
+  region?: string;
+  interests?: string[];
+};
+
+export type UserFeedbackPreferences = {
+  categories: Array<{
+    id: string;
+    user_id: string;
+    category_id: string;
+    score: number;
+    created_at: string;
+    updated_at: string;
+    category: { id: string; name: string; slug: string };
+  }>;
+  sources: Array<{
+    id: string;
+    user_id: string;
+    source_id: string;
+    score: number;
+    created_at: string;
+    updated_at: string;
+    source: { id: string; name: string; url: string };
+  }>;
 };
 
 export function getUser(id: string) {
@@ -83,4 +111,28 @@ export function confirmPhoneVerification(id: string, input: { code: string }) {
     body: input,
     auth: true,
   });
+}
+
+export function getFeedbackPreferences(id: string) {
+  return apiFetch<UserFeedbackPreferences>(
+    endpoints.users.feedbackPreferences.list(id),
+    {
+      method: "GET",
+      auth: true,
+    },
+  );
+}
+
+export function unmuteCategory(id: string, categoryId: string) {
+  return apiFetch<{ message: string }>(
+    endpoints.users.feedbackPreferences.unmuteCategory(id, categoryId),
+    { method: "DELETE", auth: true },
+  );
+}
+
+export function unmuteSource(id: string, sourceId: string) {
+  return apiFetch<{ message: string }>(
+    endpoints.users.feedbackPreferences.unmuteSource(id, sourceId),
+    { method: "DELETE", auth: true },
+  );
 }

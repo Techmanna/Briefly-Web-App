@@ -1,6 +1,6 @@
 import { getApiBaseUrl } from "./config";
 import { ApiError } from "./errors";
-import { getAccessToken } from "./session";
+import { clearSession, getAccessToken } from "./session";
 
 type RequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
@@ -56,7 +56,8 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}) {
     // Auto-redirect if unauthorized or forbidden
     if (typeof window !== "undefined") {
       const isAdminPath = window.location.pathname.startsWith("/admin");
-      const isLoginRequest = path.includes("/auth/login");
+      const isLoginRequest =
+        path.includes("/auth/login") || path.includes("/admin/auth/login");
 
       if (!isLoginRequest) {
         if (
@@ -64,9 +65,13 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}) {
             message.toLowerCase().includes("admin access required")) ||
           (res.status === 401 && isAdminPath)
         ) {
+          clearSession();
+          window.dispatchEvent(new Event("briefly:auth:logout"));
           window.location.href = "/admin/login";
         } else if (res.status === 401 && !isAdminPath) {
-          window.location.href = "/";
+          clearSession();
+          window.dispatchEvent(new Event("briefly:auth:logout"));
+          window.location.href = "/?auth=login";
         }
       }
     }

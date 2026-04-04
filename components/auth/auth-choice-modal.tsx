@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { GoogleSignInButton } from "@/components/auth/google-signin-button";
@@ -17,7 +17,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TelegramIcon, WhatsAppIcon } from "@/components/icons";
+import { PhoneNumberInput } from "@/components/phone/phone-number-input";
+import { WhatsAppIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/toast";
 import {
@@ -30,7 +31,7 @@ import {
 } from "@/api";
 import { loginSchema, signupSchema } from "@/lib/validations/auth";
 import type { TelegramRegisterResponse } from "@/api/clients/auth";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, Mail } from "lucide-react";
 
 type AuthMode = "login" | "signup";
 
@@ -42,6 +43,8 @@ type Props = {
 
 export function AuthChoiceModal({ open, mode, onClose }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<
     | "choice"
     | "email"
@@ -96,7 +99,15 @@ export function AuthChoiceModal({ open, mode, onClose }: Props) {
 
   const goToWhatsapp = () => setStep("whatsapp_request");
 
-  const goToTelegram = () => setStep("telegram");
+  const switchAuthMode = () => {
+    const nextMode = mode === "login" ? "signup" : "login";
+    const next = new URLSearchParams(searchParams.toString());
+    next.set("auth", nextMode);
+    const qs = next.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname);
+  };
+
+  // const goToTelegram = () => setStep("telegram");
 
   const backToChoice = () => {
     setStep("choice");
@@ -113,7 +124,7 @@ export function AuthChoiceModal({ open, mode, onClose }: Props) {
   });
 
   const whatsappRequestSchema = z.object({
-    phone: z.string().min(6, "Phone number is required"),
+    phone: z.string().regex(/^\+\d{8,15}$/, "Enter a valid phone number"),
   });
 
   const whatsappVerifySchema = z.object({
@@ -190,9 +201,7 @@ export function AuthChoiceModal({ open, mode, onClose }: Props) {
                 <GoogleSignInButton
                   onSuccess={() => {
                     onClose();
-                    router.push(
-                      mode === "signup" ? "/onboarding" : "/dashboard",
-                    );
+                    router.push(mode === "signup" ? "/onboarding" : "/news");
                   }}
                 />
               </div>
@@ -211,25 +220,26 @@ export function AuthChoiceModal({ open, mode, onClose }: Props) {
               <div className="grid gap-3">
                 <Button
                   variant="outline"
-                  className="h-12 rounded-2xl justify-center gap-3 text-base"
+                  className="h-10 rounded-full justify-center gap-3 text-sm"
                   onClick={goToWhatsapp}
                 >
                   <WhatsAppIcon className="h-5 w-5 text-[#25D366]" />
                   Continue with WhatsApp
                 </Button>
-                <Button
+                {/* <Button
                   variant="outline"
-                  className="h-12 rounded-2xl justify-center gap-3 text-base"
+                  className="h-10 rounded-full justify-center gap-3 text-sm"
                   onClick={goToTelegram}
                 >
                   <TelegramIcon className="h-5 w-5 text-[#24A1DE]" />
                   Continue with Telegram
-                </Button>
+                </Button> */}
                 <Button
                   variant="outline"
-                  className="h-12 rounded-2xl justify-center text-base"
+                  className="h-10 rounded-full justify-center text-sm"
                   onClick={goToEmail}
                 >
+                  <Mail className="h-5 w-5" />
                   Continue with email
                 </Button>
               </div>
@@ -245,7 +255,7 @@ export function AuthChoiceModal({ open, mode, onClose }: Props) {
                       await loginMutation.mutateAsync(data);
                       toast.success("Signed in");
                       onClose();
-                      router.push("/dashboard");
+                      router.push("/news");
                     } catch (e) {
                       toast.error((e as Error).message || "Sign in failed");
                     }
@@ -442,12 +452,21 @@ export function AuthChoiceModal({ open, mode, onClose }: Props) {
                   <Label htmlFor="phone" className="text-sm font-medium ml-1">
                     Phone number
                   </Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="+2348012345678"
-                    className="h-11 rounded-xl bg-background/50 border-border/60 focus:bg-background transition-all duration-200"
-                    {...whatsappRequestForm.register("phone")}
+                  <Controller
+                    control={whatsappRequestForm.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <PhoneNumberInput
+                        inputId="phone"
+                        value={field.value}
+                        onChange={field.onChange}
+                        disabled={
+                          whatsappRequestForm.formState.isSubmitting ||
+                          whatsappRequestOtp.isPending
+                        }
+                        placeholder="8012345678"
+                      />
+                    )}
                   />
                   {whatsappRequestForm.formState.errors.phone ? (
                     <p className="text-sm text-destructive font-medium ml-1">
@@ -546,7 +565,7 @@ export function AuthChoiceModal({ open, mode, onClose }: Props) {
                     });
                     toast.success("Password saved");
                     onClose();
-                    router.push("/dashboard");
+                    router.push("/news");
                   } catch (e) {
                     toast.error(
                       (e as Error).message || "Failed to save password",
@@ -706,6 +725,36 @@ export function AuthChoiceModal({ open, mode, onClose }: Props) {
           <div className="text-center text-sm text-muted-foreground">
             By continuing, you agree to Briefly&apos;s Terms and Privacy Policy.
           </div>
+
+          <div className="w-full border-t border-border/60" />
+
+          {step === "choice" || step === "email" ? (
+            <div className="text-center text-sm text-muted-foreground">
+              {mode === "login" ? (
+                <>
+                  Don&apos;t have an account?{" "}
+                  <button
+                    type="button"
+                    className="font-semibold text-primary hover:text-primary/80 transition-colors"
+                    onClick={switchAuthMode}
+                  >
+                    Sign up
+                  </button>
+                </>
+              ) : (
+                <>
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    className="font-semibold text-primary hover:text-primary/80 transition-colors"
+                    onClick={switchAuthMode}
+                  >
+                    Sign in
+                  </button>
+                </>
+              )}
+            </div>
+          ) : null}
         </div>
       </DialogContent>
     </Dialog>

@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SourceDialog } from "./source-dialog";
+import { BulkImportDialog } from "./bulk-import-dialog";
 import { toast } from "@/lib/toast";
 
 export default function SourcesPage() {
@@ -30,6 +31,7 @@ export default function SourcesPage() {
   const updateMutation = useUpdateSourceMutation();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
   const [actionStates, setActionStates] = useState<
     Record<string, { isToggling?: boolean; isDeleting?: boolean }>
@@ -122,13 +124,22 @@ export default function SourcesPage() {
             Manage RSS feeds and content providers.
           </p>
         </div>
-        <Button
-          onClick={handleCreate}
-          className="rounded-xl h-11 px-6 font-bold gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Add Source
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setIsBulkDialogOpen(true)}
+            className="rounded-xl h-11 px-6 font-bold"
+          >
+            Bulk Import
+          </Button>
+          <Button
+            onClick={handleCreate}
+            className="rounded-xl h-11 px-6 font-bold gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Add Source
+          </Button>
+        </div>
       </div>
 
       <Card className="border-border shadow-none rounded-lg overflow-hidden">
@@ -138,6 +149,7 @@ export default function SourcesPage() {
               <thead className="bg-secondary/30 text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
                 <tr>
                   <th className="px-6 py-4">Source</th>
+                  <th className="px-6 py-4">Geo</th>
                   <th className="px-6 py-4">RSS Feed</th>
                   <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4">Credibility</th>
@@ -164,6 +176,16 @@ export default function SourcesPage() {
                           {source.url.replace(/^https?:\/\//, "")}
                           <ExternalLink className="h-3 w-3" />
                         </a>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs font-medium">
+                          {source.country || "—"}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {source.region || "—"}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -252,7 +274,7 @@ export default function SourcesPage() {
                 {sortedSources?.length === 0 && (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={6}
                       className="px-6 py-12 text-center text-muted-foreground"
                     >
                       No sources found. Click &quot;Add Source&quot; to create
@@ -270,6 +292,10 @@ export default function SourcesPage() {
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         sourceId={selectedSourceId}
+      />
+      <BulkImportDialog
+        isOpen={isBulkDialogOpen}
+        onClose={() => setIsBulkDialogOpen(false)}
       />
     </div>
   );

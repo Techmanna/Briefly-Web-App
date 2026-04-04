@@ -33,9 +33,9 @@ export default function NotFound() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="rounded-full px-6">
-                  <Link href="/dashboard">
+                  <Link href="/news">
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to dashboard
+                    Back to news
                   </Link>
                 </Button>
               </div>

@@ -1,13 +1,13 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { ExternalLink, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { digestClient } from "@/api";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { DigestNewsItem } from "@/components/briefs/digest-news-item";
 
 export function BriefClient() {
   const params = useParams();
@@ -117,46 +117,22 @@ export function BriefClient() {
               const title = item.news?.title ?? "Untitled";
               const summary = item.news?.summary ?? "";
               const url = item.news?.url?.trim() || undefined;
+              const newsId = item.news?.id;
 
               return (
-                <div
+                <DigestNewsItem
                   key={item.id}
-                  className={cn(
-                    "glass-panel rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border-border/60",
-                    "animate-slide-up",
-                  )}
+                  variant="glass"
+                  category={category}
+                  source={source}
+                  title={title}
+                  summary={summary}
+                  url={url}
+                  newsId={newsId}
+                  rank={item.rank}
+                  className="hover:shadow-md transition-all duration-300 animate-slide-up"
                   style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-bold text-primary uppercase tracking-wider bg-secondary px-2 py-1 rounded-md">
-                      {category}
-                    </span>
-                    <span className="text-xs text-muted-foreground font-medium">
-                      {source}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-heading font-semibold leading-tight mb-3 text-primary">
-                    {item.rank}. {title}
-                  </h3>
-                  <p className="text-muted-foreground text-base leading-relaxed mb-4">
-                    {summary || "Open to read the full story."}
-                  </p>
-                  {url ? (
-                    <div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        asChild
-                        className="rounded-full px-4 hover:bg-primary hover:text-primary-foreground transition-colors text-xs"
-                      >
-                        <a href={url} target="_blank" rel="noreferrer">
-                          Read Full Story{" "}
-                          <ExternalLink className="ml-2 h-3 w-3" />
-                        </a>
-                      </Button>
-                    </div>
-                  ) : null}
-                </div>
+                />
               );
             })
           : null}

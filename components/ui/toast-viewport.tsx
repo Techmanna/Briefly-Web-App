@@ -34,6 +34,23 @@ export function ToastViewport() {
                 {t.description}
               </div>
             ) : null}
+            {t.action ? (
+              <div className="mt-3">
+                <button
+                  type="button"
+                  className="text-sm font-semibold text-primary hover:underline"
+                  onClick={() => {
+                    try {
+                      t.action?.onClick();
+                    } finally {
+                      dismissToast(t.id);
+                    }
+                  }}
+                >
+                  {t.action.label}
+                </button>
+              </div>
+            ) : null}
           </div>
           <button
             type="button"

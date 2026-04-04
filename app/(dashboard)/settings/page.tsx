@@ -14,14 +14,18 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneNumberInput } from "@/components/phone/phone-number-input";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import {
-  categoriesClient,
+  interestsClient,
   useConfirmPhoneVerificationMutation,
   useRequestPhoneVerificationMutation,
   useSetPasswordMutation,
+  useUnmuteCategoryMutation,
+  useUnmuteSourceMutation,
+  useUserFeedbackPreferencesQuery,
   useUpdatePreferencesMutation,
   usersClient,
 } from "@/api";
@@ -38,9 +42,9 @@ export default function SettingsPage() {
   const { session, clearSession } = useAuth();
   const userId = session?.user.id ?? "";
 
-  const categoriesQuery = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => categoriesClient.listCategories(),
+  const interestsQuery = useQuery({
+    queryKey: ["interests"],
+    queryFn: () => interestsClient.listInterests(),
   });
 
   const userQuery = useQuery({
@@ -55,8 +59,11 @@ export default function SettingsPage() {
   const requestPhoneVerification = useRequestPhoneVerificationMutation(userId);
   const confirmPhoneVerification = useConfirmPhoneVerificationMutation(userId);
   const setPassword = useSetPasswordMutation();
+  const feedbackPrefsQuery = useUserFeedbackPreferencesQuery(userId);
+  const unmuteCategory = useUnmuteCategoryMutation(userId);
+  const unmuteSource = useUnmuteSourceMutation(userId);
 
-  const [selectedCategoryIdsDraft, setSelectedCategoryIdsDraft] = useState<
+  const [selectedTopicsDraft, setSelectedTopicsDraft] = useState<
     string[] | null
   >(null);
   const [emailEnabledDraft, setEmailEnabledDraft] = useState<boolean | null>(
@@ -86,18 +93,22 @@ export default function SettingsPage() {
   const section = searchParams.get("section");
 
   useEffect(() => {
-    if (section !== "whatsapp") return;
-    const el = document.getElementById("whatsapp-setup");
+    let el: HTMLElement | null = null;
+
+    if (section === "whatsapp") {
+      el = document.getElementById("whatsapp-setup");
+    } else if (section === "preferences") {
+      el = document.getElementById("delivery-preferences");
+    }
+
     if (!el) return;
+
     window.setTimeout(() => {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      el!.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
   }, [section]);
 
-  const selectedCategoryIds =
-    selectedCategoryIdsDraft ??
-    user?.subscriptions?.map((s) => s.category_id) ??
-    [];
+  const selectedTopics = selectedTopicsDraft ?? user?.interests ?? [];
   const emailEnabled = emailEnabledDraft ?? Boolean(user?.email_enabled);
   const pushEnabled = pushEnabledDraft ?? Boolean(user?.push_enabled);
   const whatsappEnabled =
@@ -107,30 +118,31 @@ export default function SettingsPage() {
   const languagePreference =
     languagePreferenceDraft ?? user?.language_preference ?? "en";
 
-  const phoneNumber = phoneNumberDraft ?? user?.phone ?? "";
+  const phoneNumber =
+    phoneNumberDraft ?? user?.whatsapp_number ?? user?.phone ?? "";
   const name = nameDraft ?? user?.name ?? "";
   const email = emailDraft ?? user?.email ?? "";
 
-  const toggleCategoryId = (categoryId: string) => {
-    setSelectedCategoryIdsDraft((prevDraft) => {
-      const base = prevDraft ?? selectedCategoryIds;
-      return base.includes(categoryId)
-        ? base.filter((id) => id !== categoryId)
-        : [...base, categoryId];
+  const toggleTopic = (slug: string) => {
+    setSelectedTopicsDraft((prevDraft) => {
+      const base = prevDraft ?? selectedTopics;
+      return base.includes(slug)
+        ? base.filter((s) => s !== slug)
+        : [...base, slug];
     });
   };
 
-  async function onSaveCategories() {
-    if (selectedCategoryIds.length < 3) {
-      toast.error("Please select at least 3 categories.");
+  async function onSaveTopics() {
+    if (selectedTopics.length < 3) {
+      toast.error("Please select at least 3 topics.");
       return;
     }
     try {
-      await updatePreferences.mutateAsync({ categoryIds: selectedCategoryIds });
-      setSelectedCategoryIdsDraft(null);
-      toast.success("Categories saved");
+      await updatePreferences.mutateAsync({ topics: selectedTopics });
+      setSelectedTopicsDraft(null);
+      toast.success("Topics saved");
     } catch (e) {
-      toast.error((e as Error).message || "Failed to save categories");
+      toast.error((e as Error).message || "Failed to save topics");
     }
   }
 
@@ -154,19 +166,13 @@ export default function SettingsPage() {
     }
   }
 
-  async function onSaveLanguagePreference() {
-    try {
-      await updatePreferences.mutateAsync({
-        languagePreference,
-      });
-      setLanguagePreferenceDraft(null);
-      toast.success("Language saved");
-    } catch (e) {
-      toast.error((e as Error).message || "Failed to save language");
-    }
-  }
-
   async function onRequestPhoneCode() {
+    if (!/^\+\d{8,15}$/.test(phoneNumber.trim())) {
+      toast.error("Enter a valid phone number", {
+        description: "Include the country code (e.g. +234...).",
+      });
+      return;
+    }
     try {
       const res = await requestPhoneVerification.mutateAsync({ phoneNumber });
       setPhoneNumberDraft(null);
@@ -318,35 +324,35 @@ export default function SettingsPage() {
       <div className="grid gap-8">
         <Card className="rounded-2xl shadow-sm border-border/60">
           <CardHeader>
-            <CardTitle className="font-heading text-xl">Categories</CardTitle>
+            <CardTitle className="font-heading text-xl">Topics</CardTitle>
             <CardDescription className="text-base">
               Select the topics you want to see in your daily brief.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {(categoriesQuery.data ?? []).map((category) => (
+              {(interestsQuery.data ?? []).map((interest) => (
                 <div
-                  key={category.id}
+                  key={interest.id}
                   className={cn(
                     "flex items-center space-x-3 rounded-xl border border-border/50 p-4 cursor-pointer transition-all duration-200 hover:shadow-sm hover:border-primary/20",
-                    selectedCategoryIds.includes(category.id)
+                    selectedTopics.includes(interest.slug)
                       ? "border-primary bg-primary/5 shadow-sm"
                       : "bg-card",
                   )}
-                  onClick={() => toggleCategoryId(category.id)}
+                  onClick={() => toggleTopic(interest.slug)}
                 >
                   <Checkbox
-                    id={`settings-${category.id}`}
-                    checked={selectedCategoryIds.includes(category.id)}
-                    onCheckedChange={() => toggleCategoryId(category.id)}
+                    id={`settings-${interest.id}`}
+                    checked={selectedTopics.includes(interest.slug)}
+                    onCheckedChange={() => toggleTopic(interest.slug)}
                     className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                   />
                   <Label
-                    htmlFor={`settings-${category.id}`}
+                    htmlFor={`settings-${interest.id}`}
                     className="cursor-pointer font-medium text-sm"
                   >
-                    {category.name}
+                    {interest.name}
                   </Label>
                 </div>
               ))}
@@ -355,22 +361,25 @@ export default function SettingsPage() {
           <CardFooter className="border-t border-border/40 px-6 py-4 bg-muted/20 rounded-b-2xl">
             <Button
               className="rounded-full px-6 shadow-sm"
-              onClick={onSaveCategories}
+              onClick={onSaveTopics}
               disabled={
-                selectedCategoryIds.length < 3 ||
-                categoriesQuery.isPending ||
+                selectedTopics.length < 3 ||
+                interestsQuery.isPending ||
                 userQuery.isPending ||
                 updatePreferences.isPending
               }
             >
-              {selectedCategoryIds.length < 3
-                ? `Select ${3 - selectedCategoryIds.length} more`
-                : "Save Categories"}
+              {selectedTopics.length < 3
+                ? `Select ${3 - selectedTopics.length} more`
+                : "Save Topics"}
             </Button>
           </CardFooter>
         </Card>
 
-        <Card className="rounded-2xl shadow-sm border-border/60">
+        <Card
+          id="delivery-preferences"
+          className="rounded-2xl shadow-sm border-border/60"
+        >
           <CardHeader>
             <CardTitle className="font-heading text-xl">
               Delivery Preferences
@@ -439,7 +448,7 @@ export default function SettingsPage() {
                 }
               />
             </div>
-            <div
+            {/* <div
               className={cn(
                 "flex items-center justify-between space-x-4 p-4 rounded-xl border border-border/40 bg-card",
                 user && !user.telegram_chat_id ? "opacity-80" : "",
@@ -461,7 +470,7 @@ export default function SettingsPage() {
                   !user || updatePreferences.isPending || !user.telegram_chat_id
                 }
               />
-            </div>
+            </div> */}
           </CardContent>
           <CardFooter className="border-t border-border/40 px-6 py-4 bg-muted/20 rounded-b-2xl">
             <Button
@@ -474,7 +483,7 @@ export default function SettingsPage() {
           </CardFooter>
         </Card>
 
-        <Card className="rounded-2xl shadow-sm border-border/60">
+        {/* <Card className="rounded-2xl shadow-sm border-border/60">
           <CardHeader>
             <CardTitle className="font-heading text-xl">Language</CardTitle>
             <CardDescription className="text-base">
@@ -522,7 +531,7 @@ export default function SettingsPage() {
               Save Language
             </Button>
           </CardFooter>
-        </Card>
+        </Card> */}
 
         <Card
           id="whatsapp-setup"
@@ -541,13 +550,13 @@ export default function SettingsPage() {
               <Label htmlFor="phone" className="text-sm font-medium">
                 Phone Number
               </Label>
-              <div className="flex gap-3">
-                <Input
-                  id="phone"
+              <div className="flex gap-3 items-center">
+                <PhoneNumberInput
+                  inputId="phone"
                   value={phoneNumber}
-                  onChange={(e) => setPhoneNumberDraft(e.target.value)}
-                  placeholder="08012345678"
-                  className="rounded-xl h-11"
+                  onChange={(v) => setPhoneNumberDraft(v)}
+                  placeholder="8012345678"
+                  className="flex-1"
                   disabled={!user || requestPhoneVerification.isPending}
                 />
                 <Button
@@ -596,6 +605,129 @@ export default function SettingsPage() {
                 </div>
               </div>
             ) : null}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl shadow-sm border-border/60">
+          <CardHeader>
+            <CardTitle className="font-heading text-xl">
+              Content Controls
+            </CardTitle>
+            <CardDescription className="text-base">
+              Manage topics and sources you’ve muted via “Not interested”.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {!user ? (
+              <div className="text-sm text-muted-foreground">Loading...</div>
+            ) : feedbackPrefsQuery.isPending ? (
+              <div className="text-sm text-muted-foreground">Loading...</div>
+            ) : feedbackPrefsQuery.isError ? (
+              <div className="text-sm text-destructive">
+                {(feedbackPrefsQuery.error as Error).message ||
+                  "Failed to load content controls."}
+              </div>
+            ) : (
+              <>
+                <div className="space-y-3">
+                  <div className="text-sm font-semibold">Muted topics</div>
+                  {(feedbackPrefsQuery.data?.categories ?? []).filter(
+                    (c) => c.score <= -6,
+                  ).length === 0 ? (
+                    <div className="text-sm text-muted-foreground">
+                      No muted topics.
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {(feedbackPrefsQuery.data?.categories ?? [])
+                        .filter((c) => c.score <= -6)
+                        .map((c) => (
+                          <div
+                            key={c.id}
+                            className="flex items-center justify-between rounded-xl border border-border/50 p-4 bg-card"
+                          >
+                            <div className="flex flex-col">
+                              <div className="font-medium">
+                                {c.category?.name || "Topic"}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Score: {c.score}
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              className="rounded-full border-border/60 hover:bg-muted"
+                              onClick={async () => {
+                                try {
+                                  await unmuteCategory.mutateAsync(
+                                    c.category_id,
+                                  );
+                                  toast.success("Topic unmuted");
+                                } catch (e) {
+                                  toast.error("Failed", {
+                                    description: (e as Error).message,
+                                  });
+                                }
+                              }}
+                              disabled={unmuteCategory.isPending}
+                            >
+                              Unmute
+                            </Button>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <div className="text-sm font-semibold">Muted sources</div>
+                  {(feedbackPrefsQuery.data?.sources ?? []).filter(
+                    (s) => s.score <= -6,
+                  ).length === 0 ? (
+                    <div className="text-sm text-muted-foreground">
+                      No muted sources.
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {(feedbackPrefsQuery.data?.sources ?? [])
+                        .filter((s) => s.score <= -6)
+                        .map((s) => (
+                          <div
+                            key={s.id}
+                            className="flex items-center justify-between rounded-xl border border-border/50 p-4 bg-card"
+                          >
+                            <div className="flex flex-col">
+                              <div className="font-medium">
+                                {s.source?.name || "Source"}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Score: {s.score}
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              className="rounded-full border-border/60 hover:bg-muted"
+                              onClick={async () => {
+                                try {
+                                  await unmuteSource.mutateAsync(s.source_id);
+                                  toast.success("Source unmuted");
+                                } catch (e) {
+                                  toast.error("Failed", {
+                                    description: (e as Error).message,
+                                  });
+                                }
+                              }}
+                              disabled={unmuteSource.isPending}
+                            >
+                              Unmute
+                            </Button>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
