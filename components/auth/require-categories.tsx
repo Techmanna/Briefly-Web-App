@@ -28,8 +28,15 @@ export function RequireCategories({ children }: { children: ReactNode }) {
     // If not enough categories and not already on onboarding or settings, redirect
     const isAllowedPath =
       pathname === "/onboarding" || pathname === "/settings";
+
+      console.log({
+        subscriptionCount,
+        hasEnoughCategories,
+        user: userQuery.data
+      });
+      
     if (!hasEnoughCategories && !isAllowedPath) {
-      router.replace("/onboarding");
+      // router.replace("/onboarding");
     }
   }, [userQuery.data, userQuery.isLoading, isAuthenticated, router, pathname]);
 

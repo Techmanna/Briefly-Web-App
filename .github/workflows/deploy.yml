@@ -1,0 +1,106 @@
+name: CI + Deploy (Frontend)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: frontend-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+  deploy:
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SSH
+        env:
+          HOST: ${{ secrets.FRONTEND_HOST }}
+          SSH_KEY: ${{ secrets.FRONTEND_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+
+      - name: Upload env (optional)
+        env:
+          HOST: ${{ secrets.FRONTEND_HOST }}
+          ENV_B64: ${{ secrets.FRONTEND_ENV_B64 }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ENV_B64:-}" ]; then
+            exit 0
+          fi
+          ssh -i ~/.ssh/id_rsa "$HOST" "ENV_B64='${ENV_B64}' bash -s" <<'EOF'
+          set -euo pipefail
+          mkdir -p /var/www/briefly/app
+          echo "$ENV_B64" | base64 -d > /var/www/briefly/app/.env.production
+          EOF
+
+      - name: Deploy (frontend)
+        env:
+          HOST: ${{ secrets.FRONTEND_HOST }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/id_rsa "$HOST" "SHA='${SHA}' bash -s" <<'EOF'
+          set -euo pipefail
+          cd /var/www/briefly/app
+
+          if [ -d .git ]; then
+            git fetch --all --prune
+            git reset --hard "$SHA"
+          fi
+
+          if command -v corepack >/dev/null 2>&1; then
+            corepack enable || true
+          fi
+
+          if ! command -v pnpm >/dev/null 2>&1; then
+            corepack prepare pnpm@9.15.1 --activate
+          fi
+
+          pnpm install --frozen-lockfile
+          pnpm build
+
+          if pm2 describe briefly-app >/dev/null 2>&1; then
+            pm2 reload briefly-app --update-env
+          else
+            pm2 start ecosystem.config.cjs --only briefly-app
+          fi
+          pm2 save
+          EOF
+
