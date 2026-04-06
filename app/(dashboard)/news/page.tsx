@@ -4,6 +4,7 @@ import { NewsInfiniteFeed } from "@/components/news/news-infinite-feed";
 import type { PublicNewsItem } from "@/api/clients/news";
 
 export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "News",
@@ -31,7 +32,11 @@ export default async function NewsPage() {
         <p className="text-muted-foreground">Know what matters today.</p>
       </div>
 
-      <NewsInfiniteFeed initialItems={initialItems} minSignal={minSignal} take={take} />
+      <NewsInfiniteFeed
+        initialItems={initialItems}
+        minSignal={minSignal}
+        take={take}
+      />
     </div>
   );
 }
