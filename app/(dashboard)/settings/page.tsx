@@ -227,10 +227,10 @@ export default function SettingsPage() {
   }
 
   function onLogout() {
+    router.push("/");
     clearSession();
     queryClient.clear();
     toast.success("Logged out");
-    router.push("/");
   }
 
   async function onTogglePush(enabled: boolean) {
