@@ -22,21 +22,21 @@ export function RequireCategories({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (userQuery.isLoading || !isAuthenticated) return;
 
-    const subscriptionCount = userQuery.data?.subscriptions?.length ?? 0;
-    const hasEnoughCategories = subscriptionCount >= 3;
+    const interestCount = userQuery.data?.interests?.length ?? 0;
+    const hasEnoughCategories = interestCount >= 3;
 
     // If not enough categories and not already on onboarding or settings, redirect
     const isAllowedPath =
       pathname === "/onboarding" || pathname === "/settings";
 
       console.log({
-        subscriptionCount,
+        interestCount,
         hasEnoughCategories,
         user: userQuery.data
       });
       
     if (!hasEnoughCategories && !isAllowedPath) {
-      // router.replace("/onboarding");
+      router.replace("/onboarding");
     }
   }, [userQuery.data, userQuery.isLoading, isAuthenticated, router, pathname]);
 
