@@ -101,12 +101,12 @@ export default async function NewsDetailPage({
     articleBody: item.summary || item.content,
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://briefly.ng/news/${item.slug}`,
+      "@id": `https://joinbriefly.ng/news/${item.slug}`,
     },
     publisher: {
       "@type": "Organization",
       name: "Briefly",
-      url: "https://briefly.ng",
+      url: "https://joinbriefly.ng",
     },
   });
 

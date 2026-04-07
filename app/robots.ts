@@ -24,7 +24,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://briefly.ng/sitemap.xml",
-    host: "https://briefly.ng",
+    sitemap: "https://joinbriefly.ng/sitemap.xml",
+    host: "https://joinbriefly.ng",
   };
 }

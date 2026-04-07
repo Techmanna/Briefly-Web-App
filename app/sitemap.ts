@@ -23,25 +23,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: "https://briefly.ng/",
+      url: "https://joinbriefly.ng/",
       lastModified,
       changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: "https://briefly.ng/news",
+      url: "https://joinbriefly.ng/news",
       lastModified,
       changeFrequency: "hourly",
       priority: 0.9,
     },
     // {
-    //   url: "https://briefly.ng/briefs",
+    //   url: "https://joinbriefly.ng/briefs",
     //   lastModified,
     //   changeFrequency: "daily",
     //   priority: 0.9,
     // },
     ...news.map((n) => ({
-      url: `https://briefly.ng/news/${n.slug || n.id}`,
+      url: `https://joinbriefly.ng/news/${n.slug || n.id}`,
       lastModified: n.published_at ? new Date(n.published_at) : lastModified,
       changeFrequency: "weekly" as const,
       priority: 0.6,

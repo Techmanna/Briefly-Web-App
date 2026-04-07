@@ -93,7 +93,7 @@ export default function AdminProfilePage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@briefly.ng"
+                  placeholder="admin@joinbriefly.ng"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="rounded-xl h-11"

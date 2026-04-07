@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
-const siteUrl = new URL("https://briefly.ng");
+const siteUrl = new URL("https://joinbriefly.ng");
 
 const inter = Inter({
   variable: "--font-inter",
@@ -78,13 +78,13 @@ export default function RootLayout({
       "@context": "https://schema.org",
       "@type": "WebSite",
       name: "Briefly",
-      url: "https://briefly.ng",
+      url: "https://joinbriefly.ng",
     },
     {
       "@context": "https://schema.org",
       "@type": "Organization",
       name: "Briefly",
-      url: "https://briefly.ng",
+      url: "https://joinbriefly.ng",
     },
   ]);
 
