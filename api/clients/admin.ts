@@ -42,6 +42,35 @@ export type DigestLog = {
   status: string;
 };
 
+export type RetryFailedDigestDeliveriesResponse = {
+  digestId: string;
+  date: string;
+  users: number;
+  deliveries: number;
+};
+
+export function retryFailedDigestDeliveries(input?: {
+  digestId?: string;
+  date?: string;
+  channels?: Array<"EMAIL" | "WHATSAPP" | "TELEGRAM" | "PUSH">;
+  limit?: number;
+}) {
+  const params = new URLSearchParams();
+  if (input?.digestId) params.set("digestId", input.digestId);
+  if (input?.date) params.set("date", input.date);
+  if (input?.channels?.length) params.set("channels", input.channels.join(","));
+  if (input?.limit) params.set("limit", String(input.limit));
+
+  const url = params.toString()
+    ? `${endpoints.admin.digest.retryFailed}?${params.toString()}`
+    : endpoints.admin.digest.retryFailed;
+
+  return apiFetch<RetryFailedDigestDeliveriesResponse>(url, {
+    method: "POST",
+    auth: true,
+  });
+}
+
 export type AdminInterest = {
   id: string;
   name: string;

@@ -53,6 +53,9 @@ export const endpoints = {
     },
     stats: "/v1/admin/stats",
     users: "/v1/admin/users",
+    digest: {
+      retryFailed: "/v1/admin/digest/retry-failed",
+    },
     logs: {
       ingestion: "/v1/admin/logs/ingestion",
       digest: "/v1/admin/logs/digest",

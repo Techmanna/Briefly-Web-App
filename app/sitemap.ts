@@ -34,12 +34,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "hourly",
       priority: 0.9,
     },
-    {
-      url: "https://briefly.ng/briefs",
-      lastModified,
-      changeFrequency: "daily",
-      priority: 0.9,
-    },
+    // {
+    //   url: "https://briefly.ng/briefs",
+    //   lastModified,
+    //   changeFrequency: "daily",
+    //   priority: 0.9,
+    // },
     ...news.map((n) => ({
       url: `https://briefly.ng/news/${n.slug || n.id}`,
       lastModified: n.published_at ? new Date(n.published_at) : lastModified,

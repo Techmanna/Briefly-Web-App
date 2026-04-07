@@ -26,6 +26,14 @@ export function useDigestLogsQuery(page = 1, limit = 50) {
   });
 }
 
+export function useRetryFailedDigestDeliveriesMutation() {
+  return useMutation({
+    mutationFn: (
+      input?: Parameters<typeof adminClient.retryFailedDigestDeliveries>[0],
+    ) => adminClient.retryFailedDigestDeliveries(input),
+  });
+}
+
 export function useAdminUsersQuery(page = 1, limit = 20, search?: string) {
   return useQuery({
     queryKey: ["admin", "users", page, limit, search],
