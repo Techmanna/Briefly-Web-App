@@ -119,7 +119,9 @@ export default function SettingsPage() {
     languagePreferenceDraft ?? user?.language_preference ?? "en";
 
   const phoneNumber =
-    phoneNumberDraft ?? user?.whatsapp_number ?? user?.phone ?? "";
+    phoneNumberDraft !== null
+      ? phoneNumberDraft
+      : (user?.whatsapp_number ?? user?.phone ?? "");
   const name = nameDraft ?? user?.name ?? "";
   const email = emailDraft ?? user?.email ?? "";
 
@@ -175,8 +177,9 @@ export default function SettingsPage() {
     }
     try {
       const res = await requestPhoneVerification.mutateAsync({ phoneNumber });
-      setPhoneNumberDraft(null);
+      setPhoneNumberDraft(phoneNumber.trim());
       setIsVerificationPending(true);
+      await queryClient.invalidateQueries({ queryKey: ["user", userId] });
       toast.success("Code sent", { description: res.message });
     } catch (e) {
       toast.error((e as Error).message || "Failed to send code");
@@ -188,6 +191,8 @@ export default function SettingsPage() {
       await confirmPhoneVerification.mutateAsync({ code: phoneCode });
       setPhoneCode("");
       setIsVerificationPending(false);
+      setPhoneNumberDraft(null);
+      await queryClient.invalidateQueries({ queryKey: ["user", userId] });
       toast.success("Phone verified");
     } catch (e) {
       toast.error((e as Error).message || "Failed to verify phone");
@@ -550,18 +555,18 @@ export default function SettingsPage() {
               <Label htmlFor="phone" className="text-sm font-medium">
                 Phone Number
               </Label>
-              <div className="flex gap-3 items-center">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <PhoneNumberInput
                   inputId="phone"
                   value={phoneNumber}
-                  onChange={(v) => setPhoneNumberDraft(v)}
+                  onChange={(v) => setPhoneNumberDraft(v ?? "")}
                   placeholder="8012345678"
-                  className="flex-1"
+                  className="w-full sm:flex-1"
                   disabled={!user || requestPhoneVerification.isPending}
                 />
                 <Button
                   variant="outline"
-                  className="rounded-full border-border/60 hover:bg-muted"
+                  className="rounded-full border-border/60 hover:bg-muted w-full sm:w-auto"
                   onClick={onRequestPhoneCode}
                   disabled={
                     !user ||
@@ -573,7 +578,11 @@ export default function SettingsPage() {
                 </Button>
               </div>
               <div className="text-sm text-muted-foreground">
-                {user?.is_phone_verified ? "Verified" : "Not verified"}
+                {isVerificationPending
+                  ? "Verification pending"
+                  : user?.is_phone_verified
+                    ? "Verified"
+                    : "Not verified"}
               </div>
             </div>
 
@@ -582,17 +591,17 @@ export default function SettingsPage() {
                 <Label htmlFor="phone-code" className="text-sm font-medium">
                   Verification Code
                 </Label>
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <Input
                     id="phone-code"
                     value={phoneCode}
                     onChange={(e) => setPhoneCode(e.target.value)}
                     placeholder="123456"
-                    className="rounded-xl h-11"
+                    className="rounded-xl h-11 w-full"
                     disabled={!user || confirmPhoneVerification.isPending}
                   />
                   <Button
-                    className="rounded-full px-6 shadow-sm"
+                    className="rounded-full px-6 shadow-sm w-full sm:w-auto"
                     onClick={onConfirmPhoneCode}
                     disabled={
                       !user ||

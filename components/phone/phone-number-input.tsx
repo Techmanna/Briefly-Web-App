@@ -22,7 +22,7 @@ function splitE164(value: string, callingCodes: string[]) {
   const raw = value.trim();
   if (!raw.startsWith("+")) return null;
   const digits = raw.replace(/[^\d]/g, "");
-  if (digits.length < 8) return null;
+  // Remove the `digits.length < 8` check — it was wiping partial input
 
   const candidates = [...callingCodes].sort((a, b) => b.length - a.length);
 
