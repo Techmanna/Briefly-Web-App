@@ -110,7 +110,11 @@ export function PhoneNumberInput({
         value={national}
         onChange={(e) => {
           const next = e.target.value.replace(/[^\d]/g, "");
-          const e164 = `+${callingCode}${next}`.replace(/[^\d+]/g, "");
+          const normalizedNational = next.replace(/^0+/, "");
+          const e164 = `+${callingCode}${normalizedNational}`.replace(
+            /[^\d+]/g,
+            "",
+          );
           onChange(e164);
         }}
         placeholder={placeholder || "Phone number"}

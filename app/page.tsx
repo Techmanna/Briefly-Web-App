@@ -284,8 +284,8 @@ export default function LandingPage() {
             <Link href="/terms" className="hover:text-primary">
               Terms
             </Link>
-            <Link href="#" className="hover:text-primary">
-              Twitter
+            <Link href="https://x.com/joinbriefly" target="_blank" className="hover:text-primary">
+              Twitter (X)
             </Link>
           </div>
         </div>
